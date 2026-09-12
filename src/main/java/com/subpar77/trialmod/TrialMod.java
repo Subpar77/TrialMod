@@ -1,5 +1,6 @@
 package com.subpar77.trialmod;
 
+import com.subpar77.trialmod.block.ModBlocks;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -15,8 +16,6 @@ public class TrialMod {
     public static final String MODID = "trial_mod";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "trial_mod" namespace
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "trial_mod" namespace
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 
@@ -25,10 +24,9 @@ public class TrialMod {
     // FML will recognize some parameter types like IEventBus and pass them in automatically.
     public TrialMod(IEventBus modEventBus) {
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
-        BLOCKS.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
+        ModBlocks.register(modEventBus);
 
     }
 }
