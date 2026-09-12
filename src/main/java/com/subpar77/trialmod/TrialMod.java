@@ -2,6 +2,8 @@ package com.subpar77.trialmod;
 
 import com.subpar77.trialmod.block.ModBlocks;
 import com.subpar77.trialmod.item.ModItems;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -22,9 +24,18 @@ public class TrialMod {
     // FML will recognize some parameter types like IEventBus and pass them in automatically.
     public TrialMod(IEventBus modEventBus) {
 
-        // Register the Deferred Register to the mod event bus so items get registered
-        ModItems.register(modEventBus);
-        ModBlocks.register(modEventBus);
+        modEventBus.addListener(this::addCreative);
 
+        // Register the Deferred Register to the mod event bus so items get registered
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+
+
+    }
+
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
+        }
     }
 }
