@@ -12,7 +12,8 @@ public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(TrialMod.MODID);
 
     public static final DeferredBlock<Block> FOUNDRY_BRICK =
-            BLOCKS.registerSimpleBlock("foundry_brick", BlockBehaviour.Properties.of().strength(2.0F, 8F).sound(SoundType.STONE));
+            BLOCKS.registerSimpleBlock("foundry_brick", BlockBehaviour.Properties.of().strength(2.0F, 8F).sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops());
 
 public static void register(IEventBus modEventBus) {
     BLOCKS.register(modEventBus);
