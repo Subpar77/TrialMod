@@ -1,12 +1,15 @@
 package com.subpar77.trialmod;
 
+import com.subpar77.trialmod.block.ModBlocks;
+import com.subpar77.trialmod.item.ModItems;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(TrialMod.MODID)
@@ -15,20 +18,24 @@ public class TrialMod {
     public static final String MODID = "trial_mod";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "trial_mod" namespace
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
-    // Create a Deferred Register to hold Items which will all be registered under the "trial_mod" namespace
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus and pass them in automatically.
     public TrialMod(IEventBus modEventBus) {
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
-        BLOCKS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so items get registered
-        ITEMS.register(modEventBus);
+        modEventBus.addListener(this::addCreative);
 
+        // Register the Deferred Register to the mod event bus so items get registered
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+
+
+    }
+
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
+        }
     }
 }
