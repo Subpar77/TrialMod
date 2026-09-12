@@ -15,14 +15,14 @@ public class TrialMod {
     public static final String MODID = "trial_mod";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "trialmod" namespace
+    // Create a Deferred Register to hold Blocks which will all be registered under the "trial_mod" namespace
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
-    // Create a Deferred Register to hold Items which will all be registered under the "trialmod" namespace
+    // Create a Deferred Register to hold Items which will all be registered under the "trial_mod" namespace
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
 
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
-    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+    // FML will recognize some parameter types like IEventBus and pass them in automatically.
     public TrialMod(IEventBus modEventBus) {
 
         // Register the Deferred Register to the mod event bus so blocks get registered
