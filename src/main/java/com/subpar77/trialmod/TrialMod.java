@@ -36,6 +36,7 @@ public class TrialMod {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
+            event.accept(ModItems.TAP_BLOCK_ITEM.get());
         }
     }
 }

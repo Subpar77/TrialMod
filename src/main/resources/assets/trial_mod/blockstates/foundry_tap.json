@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "trial_mod:block/foundry_tap"
+    }
+  }
+}

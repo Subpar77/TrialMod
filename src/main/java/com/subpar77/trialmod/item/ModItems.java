@@ -14,6 +14,8 @@ public class ModItems {
 
     public static final DeferredItem<BlockItem> FOUNDRY_BRICK_ITEM =
             ITEMS.registerSimpleBlockItem(ModBlocks.FOUNDRY_BRICK, new Item.Properties());
+    public static final DeferredItem<BlockItem> TAP_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem(ModBlocks.TAP_BLOCK, new Item.Properties());
 
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
