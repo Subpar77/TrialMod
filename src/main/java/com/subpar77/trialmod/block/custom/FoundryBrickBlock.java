@@ -12,7 +12,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Optional;
 
-import static com.subpar77.trialmod.foundry.FoundryStructure.findFoundryCenter;
 
 public class FoundryBrickBlock extends Block {
 
@@ -27,12 +26,12 @@ public class FoundryBrickBlock extends Block {
         }
 
         if (!level.isClientSide) {
-            Optional<BlockPos> centerCandidate = findFoundryCenter(level, pos);
-            BlockPos center = centerCandidate.get();
+            Optional<BlockPos> centerCandidate = FoundryStructure.findFoundryCenter(level, pos);
 
             if (centerCandidate.isEmpty()) {
                 player.displayClientMessage(Component.literal("No Foundry Found"), false);
             } else {
+                BlockPos center = centerCandidate.orElse(BlockPos.of(0));
                 player.displayClientMessage(Component.literal("Valid Foundry Found! Center at: "
                         + center.getX() + ", "
                         + center.getY() + ", "
