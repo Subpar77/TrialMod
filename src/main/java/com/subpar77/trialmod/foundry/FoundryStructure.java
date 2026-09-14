@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.*;
 
@@ -36,7 +37,8 @@ public class FoundryStructure {
                     continue;
                 }
 
-                if (neighborState.isAir()) {
+
+                if (neighborState.isAir() || level.getFluidState(neighborPos).is(Tags.Fluids.LAVA)) {
                     toCheck.add(neighborPos);
                 } else {
                     return Optional.empty();
@@ -56,7 +58,7 @@ public class FoundryStructure {
 
                 BlockPos checkPos = wallPos.offset(xOffset, 0, zOffset);
 
-                if (level.getBlockState(checkPos).isAir()) {
+                if (level.getBlockState(checkPos).isAir() || level.getFluidState(checkPos).is(Tags.Fluids.LAVA)) {
                     Optional<Set<BlockPos>> result = findBasin(level, checkPos);
                     if (result.isPresent()) {
                         return result;
