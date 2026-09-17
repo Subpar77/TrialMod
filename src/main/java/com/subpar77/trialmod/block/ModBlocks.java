@@ -2,7 +2,7 @@ package com.subpar77.trialmod.block;
 
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.custom.FoundryBrickBlock;
-import com.subpar77.trialmod.block.custom.TapBlock;
+import com.subpar77.trialmod.block.custom.FoundryTapBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
@@ -16,9 +16,10 @@ public class ModBlocks {
             BLOCKS.registerBlock("foundry_brick", FoundryBrickBlock::new,
                     BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
 
-    public static final DeferredBlock<TapBlock> TAP_BLOCK =
-            BLOCKS.registerBlock("foundry_tap", TapBlock::new,
-                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+    public static final DeferredBlock<FoundryTapBlock> FOUNDRY_TAP =
+            BLOCKS.registerBlock("foundry_tap", FoundryTapBlock::new,
+                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops().noOcclusion());
+
 
 public static void register(IEventBus modEventBus) {
     BLOCKS.register(modEventBus);

@@ -1,6 +1,7 @@
 package com.subpar77.trialmod;
 
 import com.subpar77.trialmod.block.ModBlocks;
+import com.subpar77.trialmod.block.entity.ModBlockEntities;
 import com.subpar77.trialmod.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -28,7 +29,9 @@ public class TrialMod {
 
         // Register the Deferred Register to the mod event bus so items get registered
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModItems.register(modEventBus);
+
 
 
     }
