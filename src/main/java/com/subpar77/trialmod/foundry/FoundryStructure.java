@@ -39,7 +39,7 @@ public class FoundryStructure {
                 }
 
 
-                if (neighborState.isAir() || level.getFluidState(neighborPos).is(Tags.Fluids.LAVA)) {
+                if (neighborState.isAir() || level.getFluidState(neighborPos).is(ModFluidTags.VALID_BASIN_FLUIDS)) {
                     toCheck.add(neighborPos);
                 } else {
                     return Optional.empty();
@@ -59,7 +59,7 @@ public class FoundryStructure {
 
                 BlockPos checkPos = wallPos.offset(xOffset, 0, zOffset);
 
-                if (level.getBlockState(checkPos).isAir() || level.getFluidState(checkPos).is(Tags.Fluids.LAVA)) {
+                if (level.getBlockState(checkPos).isAir() || level.getFluidState(checkPos).is(ModFluidTags.VALID_BASIN_FLUIDS)) {
                     Optional<Set<BlockPos>> result = findBasin(level, checkPos);
                     if (result.isPresent()) {
                         return result;

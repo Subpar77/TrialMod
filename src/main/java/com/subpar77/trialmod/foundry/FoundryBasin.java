@@ -32,7 +32,7 @@ public class FoundryBasin {
         for (BlockPos interiorPos : interiorPositions) {
             FluidState fluidState = level.getFluidState(interiorPos);
 
-            if (fluidState.is(Tags.Fluids.LAVA)) {
+            if (fluidState.is(ModFluidTags.VALID_BASIN_FLUIDS)) {
                 detectedFluidType = fluidState.getFluidType();
 
                 if (fluidState.isSource()) {
@@ -57,7 +57,7 @@ public class FoundryBasin {
         BlockPos sourcePos = details.sourcePos().orElseThrow();
         FluidState fluidState = level.getFluidState(sourcePos);
 
-        if (!fluidState.is(Tags.Fluids.LAVA) || !fluidState.isSource()) {
+        if (!fluidState.is(ModFluidTags.VALID_BASIN_FLUIDS) || !fluidState.isSource()) {
             return false;
         }
 

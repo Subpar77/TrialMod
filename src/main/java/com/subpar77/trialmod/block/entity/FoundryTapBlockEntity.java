@@ -7,9 +7,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 
 import java.util.Optional;
 
@@ -48,22 +49,45 @@ public class FoundryTapBlockEntity extends BlockEntity {
         }
 
         blockEntity.transferCooldown = 0;
+        attemptTransfer(level, pos, state);
+
+    }
+
+    public static  boolean attemptTransfer (Level level, BlockPos pos, BlockState state) {
         Direction outputDirection = state.getValue(FoundryTapBlock.FACING);
+        BlockPos outputPos = pos.relative(outputDirection);
+
+        if (!level.getBlockState(outputPos).isAir()) {
+            return false;
+        }
+
         Direction basinDirection = outputDirection.getOpposite();
         BlockPos wallPos = pos.relative(basinDirection);
-        Optional<BasinDetails> basinDetails = FoundryBasin.inspectBasin(level, wallPos);
 
-        if (basinDetails.isEmpty()) {
-            return;
+        Optional<BasinDetails> result = FoundryBasin.inspectBasin(level, wallPos);
+
+        if(result.isEmpty()) {
+            return false;
         }
 
-        BasinDetails details = basinDetails.get();
+        BasinDetails details = result.get();
 
         if (details.storedBuckets() <= 0) {
-            return;
+            return  false;
         }
 
-        FoundryBasin.extractOneSource(level, details);
+        BlockPos sourcePos = details.sourcePos().orElseThrow();
+
+        FluidState sourceFluid = level.getFluidState(sourcePos);
+        BlockState fluidBlock = sourceFluid.createLegacyBlock();
+
+        if(!FoundryBasin.extractOneSource(level, details)) {
+            return false;
+        }
+
+        level.setBlock(outputPos, fluidBlock, Block.UPDATE_ALL);
+
+        return true;
     }
 
     public float getGateProgress(float partialTick) {
