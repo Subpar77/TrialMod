@@ -14,6 +14,7 @@ import net.minecraft.world.level.BlockEventData;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +45,7 @@ public class FoundryTapBlock extends Block implements EntityBlock {
     }
 
     private record BasinDetails(int capacity, int storedBuckets,
-                                int availableCapacity, Optional<FluidType> fluidType) {}
+                                int availableCapacity, Optional<FluidType> fluidType, Optional<BlockPos> sourcePos) {}
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
@@ -78,22 +79,45 @@ public class FoundryTapBlock extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        boolean isOpen = state.getValue(OPEN);
+
         if (!player.getMainHandItem().isEmpty()) {
             return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide && player.isShiftKeyDown()) {
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
+        if (player.isShiftKeyDown()) {
             return useWhileSneaking(state, level, pos, player, hitResult);
         }
 
-        if (!level.isClientSide) {
-            // Debugging
-            BlockState newState = state.cycle(OPEN);
+        if(isOpen) {
+               level.setBlock(pos, state.setValue(OPEN, false), Block.UPDATE_ALL);
+           } else {
+            Direction outputDirection = state.getValue(FACING);
+            Direction basinDirection = outputDirection.getOpposite();
+            BlockPos wallPos = pos.relative(basinDirection);
+            Optional<BasinDetails> basinDetails = examineStructure(level, wallPos);
 
-            level.setBlock(pos, state.cycle(OPEN), Block.UPDATE_ALL);
+            if (basinDetails.isPresent()) {
+                level.setBlock(pos, state.setValue(OPEN, true), Block.UPDATE_ALL);
+                BasinDetails details = basinDetails.get();
 
-            player.sendSystemMessage(Component.literal("Tap open: " + newState.getValue(OPEN)));
+                if (details.storedBuckets() > 0 && details.fluidType.isPresent()) {
+                    Component fluidName = details.fluidType().get().getDescription();
+                    BlockPos sourcePos = details.sourcePos().get();
+                    Component message = Component.literal("Opening tap: " + formatBuckets(details.storedBuckets()) + " of ")
+                            .append(fluidName).append(Component.literal("."));
 
+                    player.displayClientMessage(message, false);
+                    player.displayClientMessage(Component.literal("Located at: X=" + sourcePos.getX() + ", Y=" +sourcePos.getY() + ", Z=" +sourcePos.getZ()),false);
+                    extractOneSource(level, details);
+                } else {
+                    player.displayClientMessage(Component.literal("Opening tap: basin is empty."), false);
+                }
+            }
         }
 
             return InteractionResult.SUCCESS;
@@ -137,6 +161,7 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         if (details.fluidType().isPresent()) {
                             Component fluidName = details.fluidType().get().getDescription();
                             player.displayClientMessage(Component.literal("Currently Contains: " + formatBuckets(details.storedBuckets()) + " of ").append(fluidName), false);
+                            player.displayClientMessage(Component.literal("Located at: ").append(String.valueOf(details.sourcePos())).append(Component.literal(".")), false);
                         }
 
                         player.displayClientMessage(Component.literal("Current free capacity: " + formatBuckets(details.availableCapacity())), false);
@@ -158,6 +183,8 @@ public class FoundryTapBlock extends Block implements EntityBlock {
 
         Set<BlockPos> interiorPositions = result.get();
         int storedBuckets = 0;
+        Optional<BlockPos> sourcePos = Optional.empty();
+
         FluidType detectedFluidType = null;
 
         for (BlockPos interiorPos : interiorPositions) {
@@ -168,6 +195,7 @@ public class FoundryTapBlock extends Block implements EntityBlock {
 
                 if (fluidState.isSource()) {
                     storedBuckets++;
+                    sourcePos = Optional.of(interiorPos);
                 }
             }
         }
@@ -175,8 +203,25 @@ public class FoundryTapBlock extends Block implements EntityBlock {
         int capacity = interiorPositions.size();
         int availableCapacity = capacity - storedBuckets;
 
-        return Optional.of(new BasinDetails(capacity, storedBuckets, availableCapacity, Optional.ofNullable(detectedFluidType)));
+        return Optional.of(new BasinDetails(capacity, storedBuckets, availableCapacity, Optional.ofNullable(detectedFluidType), sourcePos));
 
+    }
+
+    private static boolean extractOneSource(Level level, BasinDetails details) {
+        if (details.storedBuckets() <= 0) {
+            return false;
+        }
+
+        BlockPos sourcePos = details.sourcePos().orElseThrow();
+        FluidState fluidState = level.getFluidState(sourcePos);
+
+        if (!fluidState.is(Tags.Fluids.LAVA) || !fluidState.isSource()) {
+            return false;
+        }
+
+        level.setBlock(sourcePos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+
+        return true;
     }
 
     private String formatBuckets(int amount) {

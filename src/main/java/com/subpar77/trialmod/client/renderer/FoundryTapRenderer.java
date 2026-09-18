@@ -7,8 +7,6 @@ import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.custom.FoundryTapBlock;
 import com.subpar77.trialmod.block.entity.FoundryTapBlockEntity;
 import com.subpar77.trialmod.client.model.FoundryTapModel;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
