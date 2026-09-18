@@ -9,6 +9,7 @@ import net.neoforged.neoforge.common.Tags;
 
 import java.util.*;
 
+// Geometry Only - Is valid basin and where are its interior cells?
 public class FoundryStructure {
     public static Optional<Set<BlockPos>> findBasin(Level level, BlockPos startInterior) {
         Set<BlockPos> visited = new HashSet<>();
