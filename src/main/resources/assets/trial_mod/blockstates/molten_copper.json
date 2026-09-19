@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "trial_mod:block/molten_copper"
+      }
+    }
+  ]
+}

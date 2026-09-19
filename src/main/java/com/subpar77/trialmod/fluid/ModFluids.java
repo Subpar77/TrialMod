@@ -21,11 +21,24 @@ public class ModFluids {
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, TrialMod.MODID);
 
     public static final Supplier<FluidType> MOLTEN_COPPER_TYPE = FLUID_TYPES.register("molten_copper", () ->
-            new FluidType(FluidType.Properties.create()));
+            new FluidType(FluidType.Properties.create()
+                    .lightLevel(12)
+                    .density(3000)
+                    .viscosity(6000)
+                    .temperature(1300)
+                    .motionScale(0.002D)
+                    .canExtinguish(false)
+                    .canDrown(false)
+                    .canSwim(false)));
 
     private static BaseFlowingFluid.Properties moltenCopperProperties() {
         return new BaseFlowingFluid.Properties(MOLTEN_COPPER_TYPE, MOLTEN_COPPER_SOURCE, MOLTEN_COPPER_FLOWING)
-                .bucket(ModItems.MOLTEN_COPPER_BUCKET).block(ModBlocks.MOLTEN_COPPER_BLOCK);
+                .bucket(ModItems.MOLTEN_COPPER_BUCKET)
+                .block(ModBlocks.MOLTEN_COPPER_BLOCK)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(30)
+                .explosionResistance(100.0F);
     }
 
     public static final Supplier<FlowingFluid> MOLTEN_COPPER_SOURCE = FLUIDS.register("molten_copper", () ->

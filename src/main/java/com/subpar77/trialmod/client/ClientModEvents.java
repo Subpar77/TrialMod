@@ -18,10 +18,10 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 public class ClientModEvents {
 
     private static final ResourceLocation MOLTEN_COPPER_STILL =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "block/lava_still");
+            ResourceLocation.fromNamespaceAndPath(TrialMod.MODID, "block/molten_copper_still");
 
     private static final ResourceLocation MOLTEN_COPPER_FLOWING =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "block/lava_flow");
+            ResourceLocation.fromNamespaceAndPath(TrialMod.MODID, "block/molten_copper_flow");
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {

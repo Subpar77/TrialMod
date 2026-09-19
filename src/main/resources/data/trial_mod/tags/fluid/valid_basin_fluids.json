@@ -1,6 +1,8 @@
 {
   "replace": false,
   "values": [
-    "#c:lava"
+    "#c:lava",
+    "trial_mod:molten_copper",
+    "trial_mod:flowing_molten_copper"
   ]
 }
