@@ -3,12 +3,11 @@ package com.subpar77.trialmod.block.custom;
 import com.subpar77.trialmod.block.ModBlocks;
 import com.subpar77.trialmod.block.entity.FoundryTapBlockEntity;
 import com.subpar77.trialmod.block.entity.ModBlockEntities;
-import com.subpar77.trialmod.foundry.BasinDetails;
-import com.subpar77.trialmod.foundry.FoundryBasin;
-import com.subpar77.trialmod.foundry.FoundryStructure;
+import com.subpar77.trialmod.foundry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -147,7 +146,7 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                 Direction basinDirection = outputDirection.getOpposite();
                 BlockPos wallPos = pos.relative(basinDirection);
 
-                if (!level.getBlockState(wallPos).is(ModBlocks.FOUNDRY_BRICK)) {
+                if (!level.getBlockState(wallPos).is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
                     player.displayClientMessage(Component.literal("No Foundry Brick Found"), false);
                 } else {
                     Optional<BasinDetails> basinDetails = FoundryBasin.inspectBasin(level, wallPos);
@@ -155,9 +154,12 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         player.displayClientMessage(Component.literal("Invalid Foundry Basin"), false);
                     } else {
                         BasinDetails details = basinDetails.get();
+                        Optional<Set<BlockPos>> interior = FoundryStructure.findBasinFromWall(level, wallPos);
+                        Optional<BlockPos> basinKey = FoundryBasin.findBasinKey(interior.get());
 
                         player.displayClientMessage(Component.literal("Valid Foundry Found!"), false);
                         player.displayClientMessage(Component.literal("Max capacity of: " + formatBuckets(details.capacity())), false);
+                        basinKey.ifPresent(key -> player.displayClientMessage(Component.literal("Basin Key: " + key), false));
 
                         if (details.fluidType().isPresent()) {
                             Component fluidName = details.fluidType().get().getDescription();
@@ -166,6 +168,23 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         }
 
                         player.displayClientMessage(Component.literal("Current free capacity: " + formatBuckets(details.availableCapacity())), false);
+
+                        Set<BlockPos> checkHeat = interior.get();
+                        Optional<HeatSourceData> heat = FoundryHeat.inspect(level, checkHeat);
+                        if (heat.isEmpty()) {
+                            player.sendSystemMessage(Component.literal("No active heat sources"));
+                        } else {
+                            player.sendSystemMessage(Component.literal("Heat target: " + heat.get().maxTemperature()));
+                            player.sendSystemMessage(Component.literal("Heating rate: " + heat.get().heatingRate() ));
+                        }
+
+                        if (level instanceof ServerLevel serverLevel) {
+                            BlockPos key = basinKey.get();
+                            FoundryBasinSavedData data = FoundryBasinSavedData.get(serverLevel);
+
+                            //data.setTemperature(key, 234.0F);
+                            player.sendSystemMessage(Component.literal("Basin temperature: " + data.getTemperature(key)));
+                        }
                     }
 
                 }

@@ -8,6 +8,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidType;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -64,6 +65,15 @@ public class FoundryBasin {
         level.setBlock(sourcePos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 
         return true;
+    }
+
+    public static Optional<BlockPos> findBasinKey(Set<BlockPos> interior) {
+        return interior.stream().min(Comparator.comparingInt((BlockPos pos) -> pos.getX())
+                .thenComparingInt((BlockPos pos) -> pos.getY())
+                .thenComparingInt((BlockPos pos) -> pos.getZ()))
+                .map(BlockPos::immutable);
+
+
     }
 
 }

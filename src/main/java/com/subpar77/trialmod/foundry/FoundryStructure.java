@@ -28,13 +28,18 @@ public class FoundryStructure {
                 return Optional.empty();
             }
 
+            BlockPos floorPos = currentPos.below();
+            if(!isValidFoundryFloor(level.getBlockState(floorPos))) {
+                return Optional.empty();
+            }
+
             for (Direction direction : new Direction[] {
                 Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
 
                 BlockPos neighborPos = currentPos.relative(direction);
                 BlockState neighborState = level.getBlockState(neighborPos);
 
-                if (neighborState.is(ModBlocks.FOUNDRY_BRICK)) {
+                if (neighborState.is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
                     continue;
                 }
 
@@ -68,5 +73,9 @@ public class FoundryStructure {
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean isValidFoundryFloor(BlockState state) {
+        return state.is(ModBlockTags.VALID_FOUNDRY_BLOCKS);
     }
 }
