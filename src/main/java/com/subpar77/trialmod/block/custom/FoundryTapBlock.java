@@ -3,7 +3,9 @@ package com.subpar77.trialmod.block.custom;
 import com.subpar77.trialmod.block.ModBlocks;
 import com.subpar77.trialmod.block.entity.FoundryTapBlockEntity;
 import com.subpar77.trialmod.block.entity.ModBlockEntities;
+import com.subpar77.trialmod.fluid.ModFluids;
 import com.subpar77.trialmod.foundry.*;
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -25,7 +27,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -145,6 +149,9 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                 Direction outputDirection = state.getValue(FACING);
                 Direction basinDirection = outputDirection.getOpposite();
                 BlockPos wallPos = pos.relative(basinDirection);
+
+//                Optional<FoundryMaterial> material = FoundryMaterial.fromFluid(ModFluids.MOLTEN_COPPER_SOURCE.get());
+//                System.out.println(material);
 
                 if (!level.getBlockState(wallPos).is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
                     player.displayClientMessage(Component.literal("No Foundry Brick Found"), false);

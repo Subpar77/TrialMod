@@ -2,6 +2,7 @@ package com.subpar77.trialmod.block;
 
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.custom.FoundryBrickBlock;
+import com.subpar77.trialmod.block.custom.FoundryCopperSlagBlock;
 import com.subpar77.trialmod.block.custom.FoundryTapBlock;
 import com.subpar77.trialmod.block.custom.MoltenCopperBlock;
 import com.subpar77.trialmod.fluid.ModFluids;
@@ -19,6 +20,10 @@ public class ModBlocks {
 
     public static final DeferredBlock<FoundryBrickBlock> FOUNDRY_BRICK =
             BLOCKS.registerBlock("foundry_brick", FoundryBrickBlock::new,
+                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+
+    public static final DeferredBlock<FoundryCopperSlagBlock> COPPER_SLAG_BLOCK =
+            BLOCKS.registerBlock("copper_slag_block", FoundryCopperSlagBlock::new,
                     BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
 
     public static final DeferredBlock<FoundryTapBlock> FOUNDRY_TAP =

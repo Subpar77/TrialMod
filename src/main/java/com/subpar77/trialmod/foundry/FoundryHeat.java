@@ -16,7 +16,7 @@ public class FoundryHeat {
         BlockState state = level.getBlockState(heatPos);
 
         if (state.getBlock() instanceof CampfireBlock && state.getValue(CampfireBlock.LIT)) {
-            return Optional.of(new HeatSourceData(1200.0F, 5.0F));
+            return Optional.of(new HeatSourceData(2000.0F, 5.0F));
             }
 
         return Optional.empty();

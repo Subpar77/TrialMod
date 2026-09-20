@@ -1,11 +1,10 @@
 package com.subpar77.trialmod.foundry;
 
-import com.subpar77.trialmod.block.ModBlocks;
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.Tags;
 
 import java.util.*;
 
@@ -22,6 +21,10 @@ public class FoundryStructure {
 
             if (!visited.add(currentPos)) {
                 continue;
+            }
+
+            if (!isValidInteriorContent(level, currentPos)) {
+                return Optional.empty();
             }
 
             if (visited.size() > 4) {
@@ -44,7 +47,7 @@ public class FoundryStructure {
                 }
 
 
-                if (neighborState.isAir() || level.getFluidState(neighborPos).is(ModFluidTags.VALID_BASIN_FLUIDS)) {
+                if (isValidInteriorContent(level, neighborPos)) {
                     toCheck.add(neighborPos);
                 } else {
                     return Optional.empty();
@@ -64,7 +67,7 @@ public class FoundryStructure {
 
                 BlockPos checkPos = wallPos.offset(xOffset, 0, zOffset);
 
-                if (level.getBlockState(checkPos).isAir() || level.getFluidState(checkPos).is(ModFluidTags.VALID_BASIN_FLUIDS)) {
+                if (isValidInteriorContent(level, checkPos)) {
                     Optional<Set<BlockPos>> result = findBasin(level, checkPos);
                     if (result.isPresent()) {
                         return result;
@@ -73,6 +76,20 @@ public class FoundryStructure {
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean isValidInteriorContent(Level level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+
+        if (state.isAir()) {
+            return true;
+        }
+
+        if (state.getFluidState().is(ModFluidTags.VALID_BASIN_FLUIDS)) {
+            return true;
+        }
+
+        return FoundryMaterial.fromSolidifiedBlock(state.getBlock()).isPresent();
     }
 
     private static boolean isValidFoundryFloor(BlockState state) {

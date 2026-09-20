@@ -50,6 +50,7 @@ public class TrialMod {
             event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
             event.accept(ModItems.TAP_BLOCK_ITEM.get());
             event.accept(ModItems.MOLTEN_COPPER_BUCKET.get());
+            event.accept(ModBlocks.COPPER_SLAG_BLOCK.get());
         }
     }
 }

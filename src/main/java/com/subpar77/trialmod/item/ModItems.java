@@ -16,9 +16,13 @@ public class ModItems {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(TrialMod.MODID);
 
     public static final DeferredItem<BlockItem> FOUNDRY_BRICK_ITEM =
-            ITEMS.registerSimpleBlockItem(ModBlocks.FOUNDRY_BRICK, new Item.Properties());
+            ITEMS.registerSimpleBlockItem("foundry_brick", ModBlocks.FOUNDRY_BRICK, new Item.Properties());
+    public static final DeferredItem<BlockItem> COPPER_SLAG_ITEM =
+            ITEMS.registerSimpleBlockItem("copper_slag_block",ModBlocks.COPPER_SLAG_BLOCK, new Item.Properties());
     public static final DeferredItem<BlockItem> TAP_BLOCK_ITEM =
-            ITEMS.registerSimpleBlockItem(ModBlocks.FOUNDRY_TAP, new Item.Properties());
+            ITEMS.registerSimpleBlockItem("foundry_tap", ModBlocks.FOUNDRY_TAP, new Item.Properties());
+
+
     public static final DeferredItem<Item> MOLTEN_COPPER_BUCKET =
             ITEMS.register("molten_copper_bucket", ()-> new BucketItem(ModFluids.MOLTEN_COPPER_SOURCE.get(),
                     new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
