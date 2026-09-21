@@ -7,6 +7,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -66,6 +67,15 @@ public enum FoundryMaterial implements StringRepresentable {
             }
         }
 
+        return Optional.empty();
+    }
+
+    public static Optional<FoundryMaterial> fromSerializedName(String name) {
+        for (FoundryMaterial material : values()) {
+            if (material.getSerializedName().equals(name)) {
+                return Optional.of(material);
+            }
+        }
         return Optional.empty();
     }
 

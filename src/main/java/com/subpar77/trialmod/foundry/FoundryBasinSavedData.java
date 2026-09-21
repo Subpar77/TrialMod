@@ -1,6 +1,7 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -9,7 +10,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +65,34 @@ public class FoundryBasinSavedData extends SavedData {
             setDirty();
             TrialMod.LOGGER.info("Removed basin key: " +basinKey);
         }
+    }
 
+    public void setContents(BlockPos basinKey, @Nullable FoundryMaterial material, int amoundMb) {
+        if (amoundMb <0) {
+            throw new IllegalArgumentException("Foundry basin amount cannot be negative");
+        }
 
+        FoundryBasinState state = getOrCreate(basinKey);
+        if(amoundMb == 0) {
+            state.setMaterial(null);
+            state.setAmountMb(0);
+        } else {
+            if (material == null) {
+                throw new IllegalArgumentException("Foundry basin with material amount must have a material");
+            }
+
+            state.setMaterial(material);
+            state.setAmountMb(amoundMb);
+        }
+        setDirty();
+    }
+
+    public @Nullable FoundryMaterial getMaterial(BlockPos basinKey) {
+        return getOrCreate(basinKey).getMaterial();
+    }
+
+    public int getAmountMb(BlockPos basinKey) {
+        return getOrCreate(basinKey).getAmountMb();
     }
 
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
@@ -76,8 +105,21 @@ public class FoundryBasinSavedData extends SavedData {
 
             long key = basinTag.getLong("Key");
             float temperature = basinTag.getFloat("Temperature");
+            int amountMb = basinTag.getInt("AmountMb");
+            FoundryMaterial material = null;
 
-            data.basins.put(key, new FoundryBasinState(temperature));
+            if (basinTag.contains("Material", Tag.TAG_STRING)) {
+                String materialName = basinTag.getString("Material");
+
+                material = FoundryMaterial.fromSerializedName(materialName).orElse(null);
+            }
+
+            if (material == null || amountMb <= 0) {
+                material = null;
+                amountMb = 0;
+            }
+
+            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb));
         }
 
         return data;
@@ -91,9 +133,15 @@ public class FoundryBasinSavedData extends SavedData {
 
         for (Map.Entry<Long, FoundryBasinState> entry : basins.entrySet()) {
             CompoundTag basinTag = new CompoundTag();
+            FoundryBasinState state = entry.getValue();
 
             basinTag.putLong("Key", entry.getKey());
-            basinTag.putFloat("Temperature", entry.getValue().getTemperature());
+            basinTag.putFloat("Temperature", state.getTemperature());
+            basinTag.putInt("AmountMb", state.getAmountMb());
+
+            if (state.getMaterial() != null) {
+                basinTag.putString("Material", state.getMaterial().getSerializedName());
+            }
 
             basinList.add(basinTag);
         }

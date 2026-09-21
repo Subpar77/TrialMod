@@ -193,6 +193,30 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         if (level instanceof ServerLevel serverLevel) {
                             BlockPos key = basinKey.get();
                             FoundryBasinSavedData data = FoundryBasinSavedData.get(serverLevel);
+
+//                            data.setContents(
+//                                    key,
+//                                    FoundryMaterial.COPPER,
+//                                    750
+//                            );
+
+                            player.sendSystemMessage(
+                                    Component.literal(
+                                            "Stored material: "
+                                                    + (data.getMaterial(key) == null
+                                                    ? "none"
+                                                    : data.getMaterial(key).getSerializedName())
+                                    )
+                            );
+
+                            player.sendSystemMessage(
+                                    Component.literal(
+                                            "Stored amount: "
+                                                    + data.getAmountMb(key)
+                                                    + " mB"
+                                    )
+                            );
+
                             player.sendSystemMessage(Component.literal("Basin temperature: " + data.getTemperature(key)));
 
                             SingleRecipeInput recipeInput = new SingleRecipeInput(new ItemStack(Items.COPPER_BLOCK));
