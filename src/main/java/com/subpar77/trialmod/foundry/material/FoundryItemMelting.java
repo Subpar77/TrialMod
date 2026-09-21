@@ -1,5 +1,7 @@
 package com.subpar77.trialmod.foundry.material;
 
+import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.foundry.FoundryBasin;
 import com.subpar77.trialmod.foundry.FoundryBasinSavedData;
 import com.subpar77.trialmod.foundry.recipe.FoundryMeltingRecipe;
 import com.subpar77.trialmod.foundry.recipe.ModFoundryRecipes;
@@ -34,19 +36,12 @@ public class FoundryItemMelting {
             return;
         }
 
-        //Debug
-        System.out.println("Foundry found " + itemEntities.size() + " dropped item entity/entities.");
-
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
 
-        int capacityMb = interior.size() * 1000;
+        int capacityMb = interior.size() * FoundryBasin.getCapacityMb(interior);
 
         for (ItemEntity itemEntity : itemEntities) {
             ItemStack stack = itemEntity.getItem();
-
-            //Debug
-            System.out.println("Foundry examining dropped item: " + stack.getHoverName().getString()
-            + " x" + stack.getCount());
 
             if (stack.isEmpty()) {
                 continue;
@@ -62,43 +57,36 @@ public class FoundryItemMelting {
 
             FoundryMeltingRecipe recipe = recipeHolder.get().value();
 
-            //Debug
-            System.out.println("Foundry item recipe matched: " + recipe.getMaterial().getSerializedName()
-            + " -> " + recipe.getAmountMb() + "mB");
-
             FoundryMaterial material = recipe.getMaterial();
 
             if (temperature < material.getMeltingTemperature()) {
-                //Debug
-                System.out.println("Foundry item too cold: " + temperature + " / " + material.getMeltingTemperature());
+                TrialMod.LOGGER.debug(
+                "[Foundry] {} at basin {} required {}F; basin is {}F.",
+                stack.getHoverName().getString(), basinKey, material.getMeltingTemperature(), temperature
+                );
                 continue;
             }
 
-            System.out.println(
-                    "Before storage attempt:"
-                            + " material="
-                            + (savedData.getMaterial(basinKey) == null
-                            ? "none"
-                            : savedData.getMaterial(basinKey).getSerializedName())
-                            + " amount="
-                            + savedData.getAmountMb(basinKey)
-                            + " capacity="
-                            + capacityMb
-                            + " recipeAmount="
-                            + recipe.getAmountMb()
-            );
-
-            boolean accepted = savedData.tryAddMaterial(basinKey, material, recipe.getAmountMb(), capacityMb);
-             //Debug
-            System.out.println("Foundry storage attempt accepted: " + accepted);
+            boolean accepted = savedData.tryAddMoltenMaterial(basinKey, material, recipe.getAmountMb(), capacityMb);
 
             if (!accepted) {
+                TrialMod.LOGGER.debug(
+                        "[Foundry] Could not melt {} at basin {}. Stored={} mB, molten={} mB, capacity={} mB.",
+                        stack.getHoverName().getString(), basinKey, savedData.getAmountMb(basinKey),
+                        savedData.getMoltenAmountMb(basinKey), capacityMb
+                );
                 continue;
             }
 
+            String itemName = stack.getHoverName().getString();
+
             stack.shrink(1);
-            //Debug
-            System.out.println("Foundry melted one item. Remaining stack: " + stack.getCount());
+            TrialMod.LOGGER.info(
+                    "[Foundry] Melted 1x {} into {} mB {} at basin {}."
+                    + "Stored={} mB, molten={} mB.",
+                    itemName, recipe.getAmountMb(), material.getSerializedName(), basinKey,
+                    savedData.getAmountMb(basinKey), savedData.getMoltenAmountMb(basinKey)
+            );
 
             if (stack.isEmpty()) {
                 itemEntity.discard();

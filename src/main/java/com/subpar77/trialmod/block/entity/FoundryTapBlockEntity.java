@@ -1,10 +1,14 @@
 package com.subpar77.trialmod.block.entity;
 
+import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.custom.FoundryTapBlock;
 import com.subpar77.trialmod.foundry.BasinDetails;
 import com.subpar77.trialmod.foundry.FoundryBasin;
+import com.subpar77.trialmod.foundry.FoundryBasinSavedData;
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -37,6 +41,10 @@ public class FoundryTapBlockEntity extends BlockEntity {
     }
 
     public static void serverTick(Level level, BlockPos pos, BlockState state, FoundryTapBlockEntity blockEntity) {
+        if(!(level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
         if (!state.getValue(FoundryTapBlock.OPEN)) {
             blockEntity.transferCooldown = 0;
             return;
@@ -49,21 +57,20 @@ public class FoundryTapBlockEntity extends BlockEntity {
         }
 
         blockEntity.transferCooldown = 0;
-        attemptTransfer(level, pos, state);
+        attemptTransfer(serverLevel, pos, state);
 
     }
 
-    public static  boolean attemptTransfer (Level level, BlockPos pos, BlockState state) {
+    private static boolean attemptTransfer(ServerLevel level, BlockPos pos, BlockState state) {
         Direction outputDirection = state.getValue(FoundryTapBlock.FACING);
         BlockPos outputPos = pos.relative(outputDirection);
 
-        if (!level.getBlockState(outputPos).isAir()) {
+        if(!level.getBlockState(outputPos).isAir()) {
             return false;
         }
 
         Direction basinDirection = outputDirection.getOpposite();
         BlockPos wallPos = pos.relative(basinDirection);
-
         Optional<BasinDetails> result = FoundryBasin.inspectBasin(level, wallPos);
 
         if(result.isEmpty()) {
@@ -72,22 +79,42 @@ public class FoundryTapBlockEntity extends BlockEntity {
 
         BasinDetails details = result.get();
 
-        if (details.storedBuckets() <= 0) {
-            return  false;
-        }
-
-        BlockPos sourcePos = details.sourcePos().orElseThrow();
-
-        FluidState sourceFluid = level.getFluidState(sourcePos);
-        BlockState fluidBlock = sourceFluid.createLegacyBlock();
-
-        if(!FoundryBasin.extractOneSource(level, details)) {
+        if(details.moltenAmountMb() < FoundryBasin.MB_PER_BUCKET) {
             return false;
         }
 
-        level.setBlock(outputPos, fluidBlock, Block.UPDATE_ALL);
+        FoundryMaterial material = details.material().get();
+        BlockState fluidBlock = material.getMoltenFluid().defaultFluidState().createLegacyBlock();
+        FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
 
+        boolean removed = savedData.tryRemoveMoltenMaterial(details.basinKey(), FoundryBasin.MB_PER_BUCKET);
+
+        if(!removed) {
+            return false;
+        }
+
+        boolean placed = level.setBlock(outputPos, fluidBlock, Block.UPDATE_ALL);
+
+        if(!placed) {
+            boolean restored = savedData.tryAddMoltenMaterial(details.basinKey(), material, FoundryBasin.MB_PER_BUCKET,
+                    details.capacityMb());
+
+            if(!restored) {
+                TrialMod.LOGGER.warn(
+                        "[Foundry] Failed to restore {} mB {} to basin {} after Tap output failed.",
+                        FoundryBasin.MB_PER_BUCKET, material.getSerializedName(), details.basinKey()
+                );
+            }
+            return false;
+        }
+
+        TrialMod.LOGGER.info(
+                "[Foundry] Tap {} transferred {} mB {} from basin {}. Remaining molten={} mB.",
+                pos, FoundryBasin.MB_PER_BUCKET, material.getSerializedName(), details.basinKey(), savedData.getMoltenAmountMb(
+                        details.basinKey())
+                );
         return true;
+
     }
 
     public float getGateProgress(float partialTick) {

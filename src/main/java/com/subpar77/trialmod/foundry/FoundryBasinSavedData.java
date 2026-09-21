@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class FoundryBasinSavedData extends SavedData {
 
@@ -122,7 +123,7 @@ public class FoundryBasinSavedData extends SavedData {
         return  acceptedMb;
     }
 
-    public boolean tryAddMaterial (BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
+    public boolean tryAddMoltenMaterial(BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
         if (amountMb <= 0) {
             return false;
         }
@@ -131,12 +132,20 @@ public class FoundryBasinSavedData extends SavedData {
         FoundryMaterial currentMaterial = state.getMaterial();
 
         if (currentMaterial != null && currentMaterial != material) {
+            TrialMod.LOGGER.debug(
+                    "[Foundry] Basin {} rejected {} because it contains {}.",
+                    basinKey, material.getSerializedName(), currentMaterial.getSerializedName()
+            );
             return false;
         }
 
         int availableMb = capacityMb - state.getAmountMb();
 
         if (availableMb < amountMb) {
+            TrialMod.LOGGER.debug(
+                    "[Foundry] Basin {} rejected {} mB {}. Available capacity: {} mB.",
+                    basinKey, amountMb, material.getSerializedName(), availableMb
+            );
             return false;
         }
 
@@ -145,10 +154,82 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         state.setAmountMb(state.getAmountMb() + amountMb);
+        state.setMoltenAmountMb(state.getMoltenAmountMb() + amountMb);
 
         setDirty();
 
         return true;
+    }
+
+    public int solidifyMaterial(BlockPos basinKey, int amountMb) {
+        if(amountMb <= 0) {
+            return 0;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+        int convertedMb = Math.min(amountMb, state.getMoltenAmountMb());
+
+        if(convertedMb <= 0) {
+            return 0;
+        }
+
+        state.setMoltenAmountMb(state.getMoltenAmountMb() - convertedMb);
+
+        setDirty();
+
+        return convertedMb;
+    }
+
+    public int meltMaterial(BlockPos basinKey, int amountMb) {
+        if(amountMb <= 0) {
+            return 0;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+        int solidAmountMb = state.getSolidAmountMb();
+        int convertedMb = Math.min(amountMb, solidAmountMb);
+
+        if(convertedMb <= 0) {
+            return 0;
+        }
+
+        state.setMoltenAmountMb(state.getMoltenAmountMb() + convertedMb);
+
+        setDirty();
+
+        return convertedMb;
+    }
+
+    public boolean tryRemoveMoltenMaterial(BlockPos basinKey, int amountMb) {
+        if(amountMb <= 0) {
+            return false;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+
+        if(state.getMaterial() == null || state.getMoltenAmountMb() < amountMb) {
+            return false;
+        }
+
+        state.setAmountMb(state.getAmountMb() - amountMb);
+        state.setMoltenAmountMb(state.getMoltenAmountMb() - amountMb);
+
+        if(state.getAmountMb() == 0) {
+            state.setMaterial(null);
+            state.setMoltenAmountMb(0);
+        }
+
+        setDirty();
+
+        return true;
+    }
+
+    public int getMoltenAmountMb(BlockPos basinKey) {
+        return getOrCreate(basinKey).getMoltenAmountMb();
+    }
+
+    public int getSolidAmountMb(BlockPos basinKey) {
+        return getOrCreate(basinKey).getSolidAmountMb();
     }
 
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
@@ -162,20 +243,39 @@ public class FoundryBasinSavedData extends SavedData {
             long key = basinTag.getLong("Key");
             float temperature = basinTag.getFloat("Temperature");
             int amountMb = basinTag.getInt("AmountMb");
+            int moltenAmountMb;
+
+            if(basinTag.contains("MoltenAmountMb", tag.TAG_INT)) {
+                moltenAmountMb = basinTag.getInt("MoltenAmountMb");
+            } else {
+                moltenAmountMb = amountMb;
+            }
+
             FoundryMaterial material = null;
 
             if (basinTag.contains("Material", Tag.TAG_STRING)) {
                 String materialName = basinTag.getString("Material");
 
-                material = FoundryMaterial.fromSerializedName(materialName).orElse(null);
+                Optional<FoundryMaterial> loadedMaterial = FoundryMaterial.fromSerializedName(materialName);
+
+                if(loadedMaterial.isPresent()) {
+                    material = loadedMaterial.get();
+                } else {
+                    TrialMod.LOGGER.warn(
+                            "[Foundry] Unknown saved material '{}' at basin {}. Clearing contents.",
+                            materialName, BlockPos.of(key));
+                }
             }
 
             if (material == null || amountMb <= 0) {
                 material = null;
                 amountMb = 0;
+                moltenAmountMb = 0;
             }
 
-            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb));
+            moltenAmountMb = Math.max(0, Math.min(moltenAmountMb, amountMb));
+
+            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb));
         }
 
         return data;
@@ -194,6 +294,7 @@ public class FoundryBasinSavedData extends SavedData {
             basinTag.putLong("Key", entry.getKey());
             basinTag.putFloat("Temperature", state.getTemperature());
             basinTag.putInt("AmountMb", state.getAmountMb());
+            basinTag.putInt("MoltenAmountMb", state.getMoltenAmountMb());
 
             if (state.getMaterial() != null) {
                 basinTag.putString("Material", state.getMaterial().getSerializedName());
