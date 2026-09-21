@@ -193,99 +193,17 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         if (level instanceof ServerLevel serverLevel) {
                             BlockPos key = basinKey.get();
                             FoundryBasinSavedData data = FoundryBasinSavedData.get(serverLevel);
-
-//                            data.setContents(
-//                                    key,
-//                                    FoundryMaterial.COPPER,
-//                                    750
-//                            );
-
-                            player.sendSystemMessage(
-                                    Component.literal(
-                                            "Stored material: "
-                                                    + (data.getMaterial(key) == null
-                                                    ? "none"
-                                                    : data.getMaterial(key).getSerializedName())
-                                    )
-                            );
-
-                            player.sendSystemMessage(
-                                    Component.literal(
-                                            "Stored amount: "
-                                                    + data.getAmountMb(key)
-                                                    + " mB"
-                                    )
-                            );
-
+                            //data.setContents(key, null, 0);
                             player.sendSystemMessage(Component.literal("Basin temperature: " + data.getTemperature(key)));
 
+
                             SingleRecipeInput recipeInput = new SingleRecipeInput(new ItemStack(Items.COPPER_BLOCK));
-                            var loadedRecipes =
-                                    serverLevel.getRecipeManager().getAllRecipesFor(
-                                            ModFoundryRecipes.FOUNDRY_MELTING_TYPE.get()
-                                    );
-
-                            player.sendSystemMessage(
-                                    Component.literal(
-                                            "Loaded Foundry melting recipes: "
-                                                    + loadedRecipes.size()
-                                    )
-                            );
-
-                            for (var holder : loadedRecipes) {
-
-                                FoundryMeltingRecipe loadedRecipe =
-                                        holder.value();
-
-                                player.sendSystemMessage(
-                                        Component.literal(
-                                                "Recipe: "
-                                                        + holder.id()
-                                                        + " | "
-                                                        + loadedRecipe.getMaterial().getSerializedName()
-                                                        + " | "
-                                                        + loadedRecipe.getAmountMb()
-                                                        + " mB"
-                                                        + " | Copper Block matches: "
-                                                        + loadedRecipe.matches(recipeInput, serverLevel)
-                                        )
-                                );
-                            }
 
                             var recipe = serverLevel.getRecipeManager().getRecipeFor(ModFoundryRecipes.FOUNDRY_MELTING_TYPE.get(),
                                     recipeInput, serverLevel);
 
                             if(recipe.isPresent()) {
                                 FoundryMeltingRecipe meltingRecipe = recipe.get().value();
-                                int capacityMb = interior.get().size() * 1000;
-                                int acceptedMb = data.addMaterial(key, meltingRecipe.getMaterial(),
-                                        meltingRecipe.getAmountMb(), capacityMb);
-                                player.sendSystemMessage(
-                                        Component.literal(
-                                                "Recipe produced: "
-                                                        + meltingRecipe.getAmountMb()
-                                                        + " mB "
-                                                        + meltingRecipe.getMaterial().getSerializedName()
-                                        )
-                                );
-
-                                player.sendSystemMessage(
-                                        Component.literal(
-                                                "Basin accepted: "
-                                                        + acceptedMb
-                                                        + " mB"
-                                        )
-                                );
-
-                                player.sendSystemMessage(
-                                        Component.literal(
-                                                "Basin storage: "
-                                                        + data.getAmountMb(key)
-                                                        + " / "
-                                                        + capacityMb
-                                                        + " mB"
-                                        )
-                                );
 
                                 player.sendSystemMessage(Component.literal("Found Recipe: " + meltingRecipe.getMaterial().getSerializedName()
                                 + " -> " + meltingRecipe.getAmountMb() +"mB"));

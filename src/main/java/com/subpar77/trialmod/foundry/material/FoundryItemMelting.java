@@ -13,9 +13,9 @@ import net.minecraft.world.phys.AABB;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FoundryItemMetling {
+public class FoundryItemMelting {
 
-    private FoundryItemMetling() {
+    private FoundryItemMelting() {
     }
 
     public static void process(ServerLevel level, BlockPos basinKey, Set<BlockPos> interior, float temperature) {
@@ -34,12 +34,19 @@ public class FoundryItemMetling {
             return;
         }
 
+        //Debug
+        System.out.println("Foundry found " + itemEntities.size() + " dropped item entity/entities.");
+
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
 
         int capacityMb = interior.size() * 1000;
 
         for (ItemEntity itemEntity : itemEntities) {
             ItemStack stack = itemEntity.getItem();
+
+            //Debug
+            System.out.println("Foundry examining dropped item: " + stack.getHoverName().getString()
+            + " x" + stack.getCount());
 
             if (stack.isEmpty()) {
                 continue;
@@ -54,19 +61,44 @@ public class FoundryItemMetling {
             }
 
             FoundryMeltingRecipe recipe = recipeHolder.get().value();
+
+            //Debug
+            System.out.println("Foundry item recipe matched: " + recipe.getMaterial().getSerializedName()
+            + " -> " + recipe.getAmountMb() + "mB");
+
             FoundryMaterial material = recipe.getMaterial();
 
             if (temperature < material.getMeltingTemperature()) {
+                //Debug
+                System.out.println("Foundry item too cold: " + temperature + " / " + material.getMeltingTemperature());
                 continue;
             }
 
+            System.out.println(
+                    "Before storage attempt:"
+                            + " material="
+                            + (savedData.getMaterial(basinKey) == null
+                            ? "none"
+                            : savedData.getMaterial(basinKey).getSerializedName())
+                            + " amount="
+                            + savedData.getAmountMb(basinKey)
+                            + " capacity="
+                            + capacityMb
+                            + " recipeAmount="
+                            + recipe.getAmountMb()
+            );
+
             boolean accepted = savedData.tryAddMaterial(basinKey, material, recipe.getAmountMb(), capacityMb);
+             //Debug
+            System.out.println("Foundry storage attempt accepted: " + accepted);
 
             if (!accepted) {
                 continue;
             }
 
             stack.shrink(1);
+            //Debug
+            System.out.println("Foundry melted one item. Remaining stack: " + stack.getCount());
 
             if (stack.isEmpty()) {
                 itemEntity.discard();
