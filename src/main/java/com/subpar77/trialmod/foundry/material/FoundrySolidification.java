@@ -27,7 +27,7 @@ public class FoundrySolidification {
 
             FoundryMaterial foundryMaterial = material.get();
             if(temperature <= foundryMaterial.getSolidificationTemperature()) {
-                level.setBlockAndUpdate(pos, foundryMaterial.getSoldifiedBlock().defaultBlockState());
+                level.setBlockAndUpdate(pos, foundryMaterial.getSolidifiedBlock().defaultBlockState());
             }
         }
     }

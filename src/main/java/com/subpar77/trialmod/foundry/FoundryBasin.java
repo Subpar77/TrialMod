@@ -69,8 +69,8 @@ public class FoundryBasin {
 
     public static Optional<BlockPos> findBasinKey(Set<BlockPos> interior) {
         return interior.stream().min(Comparator.comparingInt((BlockPos pos) -> pos.getX())
-                .thenComparingInt((BlockPos pos) -> pos.getY())
-                .thenComparingInt((BlockPos pos) -> pos.getZ()))
+                .thenComparingInt((BlockPos pos) -> pos.getZ())
+                .thenComparingInt((BlockPos pos) -> pos.getY()))
                 .map(BlockPos::immutable);
 
 

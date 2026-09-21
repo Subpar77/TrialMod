@@ -32,7 +32,7 @@ public class FoundryTapBlockEntity extends BlockEntity {
         if (state.getValue(FoundryTapBlock.OPEN)) {
             blockEntity.gateProgress = Math.min(1.0F, blockEntity.gateProgress + speed);
         } else {
-            blockEntity.gateProgress = Math.max(0.0F, blockEntity.gateProgress = speed);
+            blockEntity.gateProgress = Math.max(0.0F, blockEntity.gateProgress - speed);
         }
     }
 

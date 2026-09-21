@@ -16,13 +16,13 @@ public enum FoundryMaterial {
     private final float meltingTemperature;
     private final float solidificationTemperature;
     private final Supplier<? extends Fluid> moltenFluid;
-    private final Supplier<? extends Block> soldifiedBlock;
+    private final Supplier<? extends Block> solidifiedBlock;
 
-    FoundryMaterial(float meltingTemperature, float solidificationTemperature, Supplier<? extends Fluid> moltenFluid, Supplier<? extends Block> soldifiedBlock) {
+    FoundryMaterial(float meltingTemperature, float solidificationTemperature, Supplier<? extends Fluid> moltenFluid, Supplier<? extends Block> solidifiedBlock) {
         this.meltingTemperature = meltingTemperature;
         this.solidificationTemperature = solidificationTemperature;
         this.moltenFluid = moltenFluid;
-        this.soldifiedBlock = soldifiedBlock;
+        this.solidifiedBlock = solidifiedBlock;
     }
 
     public float getMeltingTemperature() {
@@ -37,8 +37,8 @@ public enum FoundryMaterial {
         return moltenFluid.get();
     }
 
-    public Block getSoldifiedBlock() {
-        return soldifiedBlock.get();
+    public Block getSolidifiedBlock() {
+        return solidifiedBlock.get();
     }
 
     public static Optional<FoundryMaterial> fromFluid(Fluid fluid) {
@@ -54,7 +54,7 @@ public enum FoundryMaterial {
 
     public static Optional<FoundryMaterial> fromSolidifiedBlock(Block block) {
         for (FoundryMaterial material : values()) {
-            if (material.getSoldifiedBlock() == block) {
+            if (material.getSolidifiedBlock() == block) {
                 return Optional.of(material);
             }
         }
