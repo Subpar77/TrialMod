@@ -6,13 +6,18 @@ import com.subpar77.trialmod.block.entity.ModBlockEntities;
 import com.subpar77.trialmod.fluid.ModFluids;
 import com.subpar77.trialmod.foundry.*;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.recipe.FoundryMeltingRecipe;
+import com.subpar77.trialmod.foundry.recipe.ModFoundryRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -188,9 +193,51 @@ public class FoundryTapBlock extends Block implements EntityBlock {
                         if (level instanceof ServerLevel serverLevel) {
                             BlockPos key = basinKey.get();
                             FoundryBasinSavedData data = FoundryBasinSavedData.get(serverLevel);
-
-                            //data.setTemperature(key, 234.0F);
                             player.sendSystemMessage(Component.literal("Basin temperature: " + data.getTemperature(key)));
+
+                            SingleRecipeInput recipeInput = new SingleRecipeInput(new ItemStack(Items.COPPER_BLOCK));
+                            var loadedRecipes =
+                                    serverLevel.getRecipeManager().getAllRecipesFor(
+                                            ModFoundryRecipes.FOUNDRY_MELTING_TYPE.get()
+                                    );
+
+                            player.sendSystemMessage(
+                                    Component.literal(
+                                            "Loaded Foundry melting recipes: "
+                                                    + loadedRecipes.size()
+                                    )
+                            );
+
+                            for (var holder : loadedRecipes) {
+
+                                FoundryMeltingRecipe loadedRecipe =
+                                        holder.value();
+
+                                player.sendSystemMessage(
+                                        Component.literal(
+                                                "Recipe: "
+                                                        + holder.id()
+                                                        + " | "
+                                                        + loadedRecipe.getMaterial().getSerializedName()
+                                                        + " | "
+                                                        + loadedRecipe.getAmountMb()
+                                                        + " mB"
+                                                        + " | Copper Block matches: "
+                                                        + loadedRecipe.matches(recipeInput, serverLevel)
+                                        )
+                                );
+                            }
+
+                            var recipe = serverLevel.getRecipeManager().getRecipeFor(ModFoundryRecipes.FOUNDRY_MELTING_TYPE.get(),
+                                    recipeInput, serverLevel);
+
+                            if(recipe.isPresent()) {
+                                FoundryMeltingRecipe meltingRecipe = recipe.get().value();
+                                player.sendSystemMessage(Component.literal("Found Recipe: " + meltingRecipe.getMaterial().getSerializedName()
+                                + " -> " + meltingRecipe.getAmountMb() +"mB"));
+                            } else {
+                                player.sendSystemMessage(Component.literal("No Foundry melting recipe found."));
+                            }
                         }
                     }
 
