@@ -1,6 +1,7 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.foundry.material.FoundryMelting;
 import com.subpar77.trialmod.foundry.material.FoundrySolidification;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -59,6 +60,7 @@ public final class FoundryEvents {
             savedData.setTemperature(basinKey, newTemperature);
 
             FoundrySolidification.solidify(level, interior.get(), newTemperature);
+            FoundryMelting.melt(level, interior.get(), newTemperature);
         }
     }
 }
