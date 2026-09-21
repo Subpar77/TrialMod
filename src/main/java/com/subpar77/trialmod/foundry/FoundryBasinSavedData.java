@@ -95,6 +95,36 @@ public class FoundryBasinSavedData extends SavedData {
         return getOrCreate(basinKey).getAmountMb();
     }
 
+    public int addMaterial(BlockPos basinKey, FoundryMaterial material, int amoubtMb, int capacityMb) {
+        if(amoubtMb <= 0) {
+            return 0;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryMaterial currentMaterial = state.getMaterial();
+
+        if (currentMaterial != null && currentMaterial != material) {
+            return  0;
+        }
+
+        int availableMb = Math.max(0, capacityMb - state.getAmountMb());
+        int acceptedMb = Math.min(amoubtMb, availableMb);
+
+        if (acceptedMb <= 0) {
+            return 0;
+        }
+
+        if (currentMaterial == null) {
+            state.setMaterial(material);
+        }
+
+        state.setAmountMb(state.getAmountMb() + acceptedMb);
+
+        setDirty();
+
+        return  acceptedMb;
+    }
+
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
         FoundryBasinSavedData data = new FoundryBasinSavedData();
 

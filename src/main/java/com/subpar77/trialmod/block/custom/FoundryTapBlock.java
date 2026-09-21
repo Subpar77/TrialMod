@@ -257,6 +257,36 @@ public class FoundryTapBlock extends Block implements EntityBlock {
 
                             if(recipe.isPresent()) {
                                 FoundryMeltingRecipe meltingRecipe = recipe.get().value();
+                                int capacityMb = interior.get().size() * 1000;
+                                int acceptedMb = data.addMaterial(key, meltingRecipe.getMaterial(),
+                                        meltingRecipe.getAmountMb(), capacityMb);
+                                player.sendSystemMessage(
+                                        Component.literal(
+                                                "Recipe produced: "
+                                                        + meltingRecipe.getAmountMb()
+                                                        + " mB "
+                                                        + meltingRecipe.getMaterial().getSerializedName()
+                                        )
+                                );
+
+                                player.sendSystemMessage(
+                                        Component.literal(
+                                                "Basin accepted: "
+                                                        + acceptedMb
+                                                        + " mB"
+                                        )
+                                );
+
+                                player.sendSystemMessage(
+                                        Component.literal(
+                                                "Basin storage: "
+                                                        + data.getAmountMb(key)
+                                                        + " / "
+                                                        + capacityMb
+                                                        + " mB"
+                                        )
+                                );
+
                                 player.sendSystemMessage(Component.literal("Found Recipe: " + meltingRecipe.getMaterial().getSerializedName()
                                 + " -> " + meltingRecipe.getAmountMb() +"mB"));
                             } else {
