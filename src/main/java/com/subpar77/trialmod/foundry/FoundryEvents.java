@@ -1,6 +1,7 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.foundry.material.FoundryItemMetling;
 import com.subpar77.trialmod.foundry.material.FoundryMelting;
 import com.subpar77.trialmod.foundry.material.FoundrySolidification;
 import net.minecraft.core.BlockPos;
@@ -58,6 +59,7 @@ public final class FoundryEvents {
             float newTemperature = FoundryThermal.calculateNewTemperature(currentTemperature, heat, FoundryTier.STONE);
 
             savedData.setTemperature(basinKey, newTemperature);
+            FoundryItemMetling.process(level, basinKey, interior.get(), newTemperature);
 
             FoundrySolidification.solidify(level, interior.get(), newTemperature);
             FoundryMelting.melt(level, interior.get(), newTemperature);

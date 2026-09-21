@@ -8,9 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,8 +92,8 @@ public class FoundryBasinSavedData extends SavedData {
         return getOrCreate(basinKey).getAmountMb();
     }
 
-    public int addMaterial(BlockPos basinKey, FoundryMaterial material, int amoubtMb, int capacityMb) {
-        if(amoubtMb <= 0) {
+    public int addMaterial(BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
+        if(amountMb <= 0) {
             return 0;
         }
 
@@ -108,7 +105,7 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         int availableMb = Math.max(0, capacityMb - state.getAmountMb());
-        int acceptedMb = Math.min(amoubtMb, availableMb);
+        int acceptedMb = Math.min(amountMb, availableMb);
 
         if (acceptedMb <= 0) {
             return 0;
@@ -123,6 +120,35 @@ public class FoundryBasinSavedData extends SavedData {
         setDirty();
 
         return  acceptedMb;
+    }
+
+    public boolean tryAddMaterial (BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
+        if (amountMb <= 0) {
+            return false;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryMaterial currentMaterial = state.getMaterial();
+
+        if (currentMaterial != null && currentMaterial != material) {
+            return false;
+        }
+
+        int availableMb = capacityMb - state.getAmountMb();
+
+        if (availableMb < amountMb) {
+            return false;
+        }
+
+        if (currentMaterial == null) {
+            state.setMaterial(material);
+        }
+
+        state.setAmountMb(state.getAmountMb() + amountMb);
+
+        setDirty();
+
+        return true;
     }
 
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
