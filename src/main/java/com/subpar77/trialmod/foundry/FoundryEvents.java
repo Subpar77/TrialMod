@@ -2,7 +2,6 @@ package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.material.FoundryItemMelting;
-import com.subpar77.trialmod.foundry.material.FoundryMelting;
 import com.subpar77.trialmod.foundry.material.FoundryPhaseTransitions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -62,7 +61,6 @@ public final class FoundryEvents {
             FoundryItemMelting.process(level, basinKey, interior.get(), newTemperature);
 
             FoundryPhaseTransitions.update(level, basinKey, newTemperature);
-            FoundryMelting.melt(level, interior.get(), newTemperature);
         }
     }
 }

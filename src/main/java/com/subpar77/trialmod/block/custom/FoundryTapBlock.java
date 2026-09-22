@@ -141,9 +141,4 @@ public class FoundryTapBlock extends Block implements EntityBlock {
         return createTickerHelper(type, ModBlockEntities.FOUNDRY_TAP_BLOCK_ENTITY.get(), FoundryTapBlockEntity::serverTick);
     }
 
-
-    private String formatBuckets(int amount) {
-        return amount + " " + (amount == 1 ? "bucket" : "buckets");
-    }
-
 }

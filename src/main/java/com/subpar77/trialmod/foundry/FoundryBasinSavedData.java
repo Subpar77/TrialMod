@@ -61,28 +61,9 @@ public class FoundryBasinSavedData extends SavedData {
     public void removeBasin(BlockPos basinKey) {
         if (basins.remove(basinKey.asLong()) != null) {
             setDirty();
-            TrialMod.LOGGER.info("Removed basin key: " +basinKey);
+            TrialMod.LOGGER.info("Removed basin key: {}",
+                    basinKey);
         }
-    }
-
-    public void setContents(BlockPos basinKey, @Nullable FoundryMaterial material, int amoundMb) {
-        if (amoundMb <0) {
-            throw new IllegalArgumentException("Foundry basin amount cannot be negative");
-        }
-
-        FoundryBasinState state = getOrCreate(basinKey);
-        if(amoundMb == 0) {
-            state.setMaterial(null);
-            state.setAmountMb(0);
-        } else {
-            if (material == null) {
-                throw new IllegalArgumentException("Foundry basin with material amount must have a material");
-            }
-
-            state.setMaterial(material);
-            state.setAmountMb(amoundMb);
-        }
-        setDirty();
     }
 
     public @Nullable FoundryMaterial getMaterial(BlockPos basinKey) {
@@ -91,36 +72,6 @@ public class FoundryBasinSavedData extends SavedData {
 
     public int getAmountMb(BlockPos basinKey) {
         return getOrCreate(basinKey).getAmountMb();
-    }
-
-    public int addMaterial(BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
-        if(amountMb <= 0) {
-            return 0;
-        }
-
-        FoundryBasinState state = getOrCreate(basinKey);
-        FoundryMaterial currentMaterial = state.getMaterial();
-
-        if (currentMaterial != null && currentMaterial != material) {
-            return  0;
-        }
-
-        int availableMb = Math.max(0, capacityMb - state.getAmountMb());
-        int acceptedMb = Math.min(amountMb, availableMb);
-
-        if (acceptedMb <= 0) {
-            return 0;
-        }
-
-        if (currentMaterial == null) {
-            state.setMaterial(material);
-        }
-
-        state.setAmountMb(state.getAmountMb() + acceptedMb);
-
-        setDirty();
-
-        return  acceptedMb;
     }
 
     public boolean tryAddMoltenMaterial(BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
@@ -245,7 +196,7 @@ public class FoundryBasinSavedData extends SavedData {
             int amountMb = basinTag.getInt("AmountMb");
             int moltenAmountMb;
 
-            if(basinTag.contains("MoltenAmountMb", tag.TAG_INT)) {
+            if(basinTag.contains("MoltenAmountMb", Tag.TAG_INT)) {
                 moltenAmountMb = basinTag.getInt("MoltenAmountMb");
             } else {
                 moltenAmountMb = amountMb;

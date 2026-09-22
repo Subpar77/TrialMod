@@ -38,7 +38,7 @@ public class FoundryItemMelting {
 
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
 
-        int capacityMb = interior.size() * FoundryBasin.getCapacityMb(interior);
+        int capacityMb = FoundryBasin.getCapacityMb(interior);
 
         for (ItemEntity itemEntity : itemEntities) {
             ItemStack stack = itemEntity.getItem();
@@ -82,7 +82,7 @@ public class FoundryItemMelting {
 
             stack.shrink(1);
             TrialMod.LOGGER.info(
-                    "[Foundry] Melted 1x {} into {} mB {} at basin {}."
+                    "[Foundry] Melted 1x {} into {} mB {} at basin {}. "
                     + "Stored={} mB, molten={} mB.",
                     itemName, recipe.getAmountMb(), material.getSerializedName(), basinKey,
                     savedData.getAmountMb(basinKey), savedData.getMoltenAmountMb(basinKey)
