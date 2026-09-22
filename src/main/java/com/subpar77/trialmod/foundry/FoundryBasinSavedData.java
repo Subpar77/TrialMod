@@ -232,6 +232,30 @@ public class FoundryBasinSavedData extends SavedData {
         return data;
     }
 
+    public boolean tryRemoveSolidMaterial(BlockPos basinKey, int amountMb) {
+
+        if(amountMb <= 0) {
+            return false;
+        }
+
+        FoundryBasinState state = getOrCreate(basinKey);
+
+        if(state.getMaterial() == null || state.getSolidAmountMb() < amountMb) {
+            return false;
+        }
+
+        state.setAmountMb(state.getAmountMb() - amountMb);
+
+        if(state.getAmountMb() == 0) {
+            state.setMaterial(null);
+            state.setMoltenAmountMb(0);
+        }
+
+        setDirty();
+
+        return true;
+    }
+
 
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {

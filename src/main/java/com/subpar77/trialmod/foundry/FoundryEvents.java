@@ -3,6 +3,8 @@ package com.subpar77.trialmod.foundry;
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.material.FoundryItemMelting;
 import com.subpar77.trialmod.foundry.material.FoundryPhaseTransitions;
+import com.subpar77.trialmod.foundry.material.FoundryPhysicalSolidMelting;
+import com.subpar77.trialmod.foundry.material.FoundrySolidification;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -56,11 +58,13 @@ public final class FoundryEvents {
             Optional<HeatSourceData> heat = FoundryHeat.inspect(level, interior.get());
             float currentTemperature = savedData.getTemperature(basinKey);
             float newTemperature = FoundryThermal.calculateNewTemperature(currentTemperature, heat, FoundryTier.STONE);
-
             savedData.setTemperature(basinKey, newTemperature);
-            FoundryItemMelting.process(level, basinKey, interior.get(), newTemperature);
 
+            FoundryItemMelting.process(level, basinKey, interior.get(), newTemperature);
+            FoundryPhysicalSolidMelting.process(level, basinKey, interior.get(), newTemperature);
             FoundryPhaseTransitions.update(level, basinKey, newTemperature);
+            FoundrySolidification.process(level, basinKey, interior.get());
+            FoundryBasinVisuals.update(level, basinKey, interior.get());
         }
     }
 }

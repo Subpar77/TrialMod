@@ -29,7 +29,8 @@ public class ModFluids {
                     .motionScale(0.002D)
                     .canExtinguish(false)
                     .canDrown(false)
-                    .canSwim(false)));
+                    .canSwim(false)
+                    .canConvertToSource(false)));
 
     private static BaseFlowingFluid.Properties moltenCopperProperties() {
         return new BaseFlowingFluid.Properties(MOLTEN_COPPER_TYPE, MOLTEN_COPPER_SOURCE, MOLTEN_COPPER_FLOWING)

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=1":  { "model": "trial_mod:block/molten_copper_display_1" },
+    "level=2":  { "model": "trial_mod:block/molten_copper_display_2" },
+    "level=3":  { "model": "trial_mod:block/molten_copper_display_3" },
+    "level=4":  { "model": "trial_mod:block/molten_copper_display_4" },
+    "level=5":  { "model": "trial_mod:block/molten_copper_display_5" },
+    "level=6":  { "model": "trial_mod:block/molten_copper_display_6" },
+    "level=7":  { "model": "trial_mod:block/molten_copper_display_7" },
+    "level=8":  { "model": "trial_mod:block/molten_copper_display_8" },
+    "level=9":  { "model": "trial_mod:block/molten_copper_display_9" },
+    "level=10": { "model": "trial_mod:block/molten_copper_display_10" },
+    "level=11": { "model": "trial_mod:block/molten_copper_display_11" },
+    "level=12": { "model": "trial_mod:block/molten_copper_display_12" },
+    "level=13": { "model": "trial_mod:block/molten_copper_display_13" },
+    "level=14": { "model": "trial_mod:block/molten_copper_display_14" },
+    "level=15": { "model": "trial_mod:block/molten_copper_display_15" },
+    "level=16": { "model": "trial_mod:block/molten_copper_display_16" }
+  }
+}

@@ -3,5 +3,6 @@
 
   "block.trial_mod.foundry_brick": "Foundry Brick",
   "block.trial_mod.foundry_tap": "Foundry Tap",
-  "block.trial_mod.copper_slag_block": "Copper Slag"
+  "block.trial_mod.copper_slag_block": "Copper Slag",
+  "block.trial_mod.copper_slag_slab": "Copper Slag Slab"
 }

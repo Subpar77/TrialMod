@@ -1,5 +1,6 @@
 package com.subpar77.trialmod.foundry;
 
+import com.subpar77.trialmod.block.custom.FoundryMoltenDisplayBlock;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -85,11 +86,15 @@ public class FoundryStructure {
             return true;
         }
 
+        if (state.getBlock() instanceof FoundryMoltenDisplayBlock) {
+            return true;
+        }
+
         if (state.getFluidState().is(ModFluidTags.VALID_BASIN_FLUIDS)) {
             return true;
         }
 
-        return FoundryMaterial.fromSolidifiedBlock(state.getBlock()).isPresent();
+        return FoundryMaterial.fromSolidifiedState(state).isPresent();
     }
 
     private static boolean isValidFoundryFloor(BlockState state) {

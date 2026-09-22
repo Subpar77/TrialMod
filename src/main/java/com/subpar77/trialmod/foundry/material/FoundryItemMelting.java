@@ -38,7 +38,7 @@ public class FoundryItemMelting {
 
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
 
-        int capacityMb = FoundryBasin.getCapacityMb(interior);
+        int capacityMb = FoundryBasin.getStateCapacityMb(level, interior);
 
         for (ItemEntity itemEntity : itemEntities) {
             ItemStack stack = itemEntity.getItem();

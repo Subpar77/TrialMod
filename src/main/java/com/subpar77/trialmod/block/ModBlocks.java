@@ -1,12 +1,10 @@
 package com.subpar77.trialmod.block;
 
 import com.subpar77.trialmod.TrialMod;
-import com.subpar77.trialmod.block.custom.FoundryBrickBlock;
-import com.subpar77.trialmod.block.custom.FoundryCopperSlagBlock;
-import com.subpar77.trialmod.block.custom.FoundryTapBlock;
-import com.subpar77.trialmod.block.custom.MoltenCopperBlock;
+import com.subpar77.trialmod.block.custom.*;
 import com.subpar77.trialmod.fluid.ModFluids;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluids;
@@ -25,6 +23,9 @@ public class ModBlocks {
     public static final DeferredBlock<FoundryCopperSlagBlock> COPPER_SLAG_BLOCK =
             BLOCKS.registerBlock("copper_slag_block", FoundryCopperSlagBlock::new,
                     BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+    public static final DeferredBlock<SlabBlock> COPPER_SLAG_SLAB =
+            BLOCKS.registerBlock("copper_slag_slab", SlabBlock::new,
+                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
 
     public static final DeferredBlock<FoundryTapBlock> FOUNDRY_TAP =
             BLOCKS.registerBlock("foundry_tap", FoundryTapBlock::new,
@@ -34,6 +35,10 @@ public class ModBlocks {
             BLOCKS.register("molten_copper", () -> new MoltenCopperBlock(ModFluids.MOLTEN_COPPER_SOURCE.get(),
                     BlockBehaviour.Properties.of().replaceable().noCollission().strength(100.0F).pushReaction(PushReaction.DESTROY)
                             .noLootTable().liquid().sound(SoundType.EMPTY)));
+    public static final DeferredBlock<FoundryMoltenDisplayBlock> MOLTEN_COPPER_DISPLAY =
+            BLOCKS.registerBlock("molten_copper_display", FoundryMoltenDisplayBlock::new,
+                    BlockBehaviour.Properties.of().replaceable().noCollission().noLootTable().strength(100.0F).pushReaction(PushReaction.DESTROY)
+                            .sound(SoundType.EMPTY).lightLevel(state -> 12));
 
 
 public static void register(IEventBus modEventBus) {

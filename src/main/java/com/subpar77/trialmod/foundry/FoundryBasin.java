@@ -1,7 +1,10 @@
 package com.subpar77.trialmod.foundry;
 
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.material.FoundrySolidForm;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.Comparator;
 import java.util.Optional;
@@ -36,6 +39,28 @@ public class FoundryBasin {
         return Optional.of(new BasinDetails(basinKey, capacityMb, savedData.getAmountMb(basinKey),
                 savedData.getMoltenAmountMb(basinKey), savedData.getTemperature(basinKey),
                 Optional.ofNullable(savedData.getMaterial(basinKey))));
+    }
+
+    public static int getPhysicalSolidAmountMb(ServerLevel level, Set<BlockPos> interior) {
+        int totalMb = 0;
+
+        for(BlockPos pos : interior){
+            BlockState state = level.getBlockState(pos);
+            Optional<FoundrySolidForm> solidForm = FoundryMaterial.fromSolidifiedState(state);
+
+            if(solidForm.isPresent()) {
+                totalMb += solidForm.get().amountMb();
+            }
+        }
+
+        return totalMb;
+    }
+
+    public static int getStateCapacityMb(ServerLevel level, Set<BlockPos> interior) {
+        int totalCapacityMb = getCapacityMb(interior);
+        int physicalSolidMb = getPhysicalSolidAmountMb(level, interior);
+
+        return Math.max(0, totalCapacityMb - physicalSolidMb);
     }
 
     public static int getCapacityMb(Set<BlockPos> interior) {

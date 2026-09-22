@@ -19,6 +19,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("foundry_brick", ModBlocks.FOUNDRY_BRICK, new Item.Properties());
     public static final DeferredItem<BlockItem> COPPER_SLAG_ITEM =
             ITEMS.registerSimpleBlockItem("copper_slag_block",ModBlocks.COPPER_SLAG_BLOCK, new Item.Properties());
+    public static final DeferredItem<BlockItem> COPPER_SLAG_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("copper_slag_slab",ModBlocks.COPPER_SLAG_SLAB, new Item.Properties());
     public static final DeferredItem<BlockItem> TAP_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("foundry_tap", ModBlocks.FOUNDRY_TAP, new Item.Properties());
 

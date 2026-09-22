@@ -23,6 +23,7 @@ public class ModCreativeTabs {
                     output.accept(ModItems.TAP_BLOCK_ITEM.get());
                     output.accept(ModItems.MOLTEN_COPPER_BUCKET.get());
                     output.accept(ModItems.COPPER_SLAG_ITEM.get());
+                    output.accept(ModItems.COPPER_SLAG_SLAB_ITEM.get());
                     }).build());
 
     public static void register(IEventBus modEventBus) {
