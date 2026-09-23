@@ -40,6 +40,16 @@ public final class FoundryEvents {
 
             if (interior.isEmpty()) {
 
+                Set<BlockPos> rememberedInterior = savedData.getInterior(basinKey);
+                FoundryBasinBreach.Result breach = FoundryBasinBreach.inspect(level, rememberedInterior);
+
+                if(breach.isBreached()) {
+                    TrialMod.LOGGER.debug(
+                            "[Foundry] Basin {} breached. Walls={}, Floors={}",
+                            basinKey, breach.wallBreaches(), breach.floorBreaches()
+                    );
+                }
+
                 float currentTemperature =
                         savedData.getTemperature(basinKey);
 
