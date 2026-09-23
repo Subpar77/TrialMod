@@ -16,6 +16,7 @@ public class FoundryBasinState {
 
     private int amountMb;
     private int moltenAmountMb;
+    private int brokenTicks;
 
     private final Set<BlockPos> interior = new HashSet<>();
 
@@ -37,6 +38,17 @@ public class FoundryBasinState {
          setInterior(interior);
     }
 
+    public FoundryBasinState(float temperature, @Nullable FoundryMaterial material, int amountMb, int moltenAmountMb,
+                             Set<BlockPos> interior, int brokenTicks) {
+         this.temperature = temperature;
+         this.material = material;
+         this.amountMb = amountMb;
+         this.moltenAmountMb = moltenAmountMb;
+         this.brokenTicks = Math.max(0, brokenTicks);
+         setInterior(interior);
+
+    }
+
     public Set<BlockPos> getInterior() {
          return Set.copyOf(interior);
     }
@@ -47,6 +59,14 @@ public class FoundryBasinState {
          for(BlockPos pos : interior) {
              this.interior.add(pos.immutable());
          }
+    }
+
+    public int getBrokenTicks() {
+        return brokenTicks;
+    }
+
+    public void setBrokenTicks(int brokenTicks) {
+        this.brokenTicks = Math.max(0, brokenTicks);
     }
 
     public float getTemperature() {

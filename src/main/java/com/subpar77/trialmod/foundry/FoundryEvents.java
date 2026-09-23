@@ -44,10 +44,15 @@ public final class FoundryEvents {
                 FoundryBasinBreach.Result breach = FoundryBasinBreach.inspect(level, rememberedInterior);
 
                 if(breach.isBreached()) {
+                    int brokenTicks = savedData.getBrokenTicks(basinKey) + 20;
+                    savedData.setBrokenTicks(basinKey, brokenTicks);
+
                     TrialMod.LOGGER.debug(
-                            "[Foundry] Basin {} breached. Walls={}, Floors={}",
-                            basinKey, breach.wallBreaches(), breach.floorBreaches()
+                            "[Foundry] Basin {} breached for {} ticks ({} seconds). Walls={}, Floors={}",
+                            basinKey, brokenTicks, brokenTicks / 20.0F, breach.wallBreaches(), breach.floorBreaches()
                     );
+                } else {
+                    savedData.setBrokenTicks(basinKey, 0);
                 }
 
                 float currentTemperature =
@@ -56,13 +61,18 @@ public final class FoundryEvents {
                 float newTemperature =
                         FoundryThermal.calculateCooling(currentTemperature);
 
-                if (FoundryThermal.isAtAmbient(newTemperature)) {
-                    savedData.removeBasin(basinKey);
-                } else {
-                    savedData.setTemperature(basinKey, newTemperature);
-                }
+                savedData.setTemperature(basinKey, newTemperature);
 
                 continue;
+            }
+
+            if(savedData.getBrokenTicks(basinKey) > 0) {
+                TrialMod.LOGGER.info(
+                        "[Foundry] Basin {} repaired after {} ticks.",
+                        basinKey, savedData.getBrokenTicks(basinKey)
+                );
+
+                savedData.setBrokenTicks(basinKey, 0);
             }
 
             Optional<HeatSourceData> heat = FoundryHeat.inspect(level, interior.get());

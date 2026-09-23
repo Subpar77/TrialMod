@@ -60,6 +60,29 @@ public class FoundryBasinSavedData extends SavedData {
         return true;
     }
 
+    public int getBrokenTicks(BlockPos basinKey) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getBrokenTicks() : 0;
+    }
+
+    public void setBrokenTicks(BlockPos basinKey, int brokenTicks) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if(state == null) {
+            return;
+        }
+
+        int newValue = Math.max(0, brokenTicks);
+
+        if(state.getBrokenTicks() == newValue) {
+            return;
+        }
+
+        state.setBrokenTicks(newValue);
+        setDirty();
+    }
+
     public Set<BlockPos> getInterior(BlockPos basinKey) {
         FoundryBasinState state = basins.get(basinKey.asLong());
 
@@ -275,7 +298,11 @@ public class FoundryBasinSavedData extends SavedData {
                 interior.add(BlockPos.of(packedPos));
             }
 
-            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior));
+            int brokenTicks = basinTag.contains("BrokenTicks", Tag.TAG_INT) ?
+                    basinTag.getInt("BrokenTicks") : 0;
+
+            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior,
+                    brokenTicks));
         }
 
         return data;
@@ -322,6 +349,7 @@ public class FoundryBasinSavedData extends SavedData {
             basinTag.putInt("AmountMb", state.getAmountMb());
             basinTag.putInt("MoltenAmountMb", state.getMoltenAmountMb());
             basinTag.putLongArray("Interior", interiorPositions);
+            basinTag.putInt("BrokenTicks", state.getBrokenTicks());
 
             if (state.getMaterial() != null) {
                 basinTag.putString("Material", state.getMaterial().getSerializedName());
@@ -331,6 +359,7 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         tag.put("Basins", basinList);
+
 
         return tag;
     }
