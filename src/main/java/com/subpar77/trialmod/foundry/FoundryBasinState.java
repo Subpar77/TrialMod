@@ -1,7 +1,11 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class FoundryBasinState {
 
@@ -13,19 +17,40 @@ public class FoundryBasinState {
     private int amountMb;
     private int moltenAmountMb;
 
+    private final Set<BlockPos> interior = new HashSet<>();
+
     public FoundryBasinState(float temperature) {
-        this(temperature, null, 0, 0);
+        this(temperature, null, 0, 0, Set.of());
     }
 
     public FoundryBasinState(float temperature, @Nullable FoundryMaterial material, int amountMb, int moltenAmountMb) {
-        this.temperature = temperature;
-        this.material = material;
-        this.amountMb = amountMb;
-        this.moltenAmountMb = moltenAmountMb;
+        this(temperature, material, amountMb, moltenAmountMb, Set.of());
+    }
+
+    public FoundryBasinState(float temperature, @Nullable FoundryMaterial material, int amountMb, int moltenAmountMb,
+                             Set<BlockPos> interior) {
+         this.temperature = temperature;
+         this.material = material;
+         this.amountMb = amountMb;
+         this.moltenAmountMb = moltenAmountMb;
+
+         setInterior(interior);
+    }
+
+    public Set<BlockPos> getInterior() {
+         return Set.copyOf(interior);
+    }
+
+    public void setInterior(Set<BlockPos> interior) {
+         this.interior.clear();
+
+         for(BlockPos pos : interior) {
+             this.interior.add(pos.immutable());
+         }
     }
 
     public float getTemperature() {
-        return temperature;
+        return  temperature;
     }
 
     public void setTemperature(float temperature) {
