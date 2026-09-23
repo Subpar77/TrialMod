@@ -34,12 +34,37 @@ public class FoundryBasin {
 
         BlockPos basinKey = basinKeyResult.get();
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
+
+        if(!savedData.isRegistered(basinKey)) {
+            return Optional.empty();
+        }
+
         int capacityMb = getCapacityMb(interior);
 
         return Optional.of(new BasinDetails(basinKey, capacityMb, savedData.getAmountMb(basinKey),
                 savedData.getMoltenAmountMb(basinKey), savedData.getTemperature(basinKey),
                 Optional.ofNullable(savedData.getMaterial(basinKey))));
     }
+
+    public static Optional<BlockPos> registerBasinFromWall (ServerLevel level, BlockPos wallPos) {
+        Optional<Set<BlockPos>> interiorResult = FoundryStructure.findBasinFromWall(level, wallPos);
+
+        if(interiorResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Optional<BlockPos> basinKeyResult = findBasinKey(interiorResult.get());
+
+        if(basinKeyResult.isEmpty()) {
+            return Optional.empty();
+        }
+
+        BlockPos basinKey = basinKeyResult.get();
+        FoundryBasinSavedData.get(level).registerBasin(basinKey);
+
+        return Optional.of(basinKey);
+    }
+
 
     public static int getPhysicalSolidAmountMb(ServerLevel level, Set<BlockPos> interior) {
         int totalMb = 0;

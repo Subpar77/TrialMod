@@ -36,6 +36,28 @@ public class FoundryBasinSavedData extends SavedData {
         return state;
     }
 
+    public boolean registerBasin(BlockPos basinKey) {
+        long key = basinKey.asLong();
+
+        if(basins.containsKey(key)) {
+            return false;
+        }
+
+        basins.put(key, new FoundryBasinState(70.0F));
+        setDirty();
+
+        TrialMod.LOGGER.info(
+                "[Foundry] REgistered basin at {}",
+                basinKey
+        );
+
+        return true;
+    }
+
+    public boolean isRegistered(BlockPos basinKey) {
+        return basins.containsKey(basinKey.asLong());
+    }
+
     public void setTemperature(BlockPos basinKey, float temperature) {
         FoundryBasinState state = getOrCreate(basinKey);
         state.setTemperature(temperature);
@@ -44,7 +66,9 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public float getTemperature(BlockPos basinKey) {
-        return getOrCreate(basinKey).getTemperature();
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getTemperature() : 70.0F;
     }
 
     private static final SavedData.Factory<FoundryBasinSavedData> FACTORY = new SavedData.Factory<>(
@@ -67,11 +91,15 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public @Nullable FoundryMaterial getMaterial(BlockPos basinKey) {
-        return getOrCreate(basinKey).getMaterial();
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getMaterial() : null;
     }
 
     public int getAmountMb(BlockPos basinKey) {
-        return getOrCreate(basinKey).getAmountMb();
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getAmountMb() : 0;
     }
 
     public boolean tryAddMoltenMaterial(BlockPos basinKey, FoundryMaterial material, int amountMb, int capacityMb) {
@@ -176,11 +204,15 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public int getMoltenAmountMb(BlockPos basinKey) {
-        return getOrCreate(basinKey).getMoltenAmountMb();
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getMoltenAmountMb() : 0;
     }
 
     public int getSolidAmountMb(BlockPos basinKey) {
-        return getOrCreate(basinKey).getSolidAmountMb();
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getSolidAmountMb() : 0;
     }
 
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {

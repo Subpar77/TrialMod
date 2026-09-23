@@ -70,6 +70,36 @@ public class FoundryTapBlock extends Block implements EntityBlock {
     }
 
     @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+
+        if(!(level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        if(oldState.is(this)) {
+            return;
+        }
+
+        Direction outputDirection = state.getValue(FACING);
+        Direction basinDirection = outputDirection.getOpposite();
+        BlockPos wallPos = pos.relative(basinDirection);
+        Optional<BlockPos> basinKey = FoundryBasin.registerBasinFromWall(serverLevel, wallPos);
+
+        if(basinKey.isPresent()) {
+            TrialMod.LOGGER.info(
+                    "[Foundry] Tap {} connected to basin {}.",
+                    pos, basinKey.get()
+            );
+        } else {
+            TrialMod.LOGGER.debug(
+                    "[Foundry] Tap {} found no valid basin behind wall {}.",
+                    pos, wallPos
+            );
+        }
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         boolean isOpen = state.getValue(OPEN);
 
