@@ -11,10 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class FoundryBasinSavedData extends SavedData {
 
@@ -36,22 +33,37 @@ public class FoundryBasinSavedData extends SavedData {
         return state;
     }
 
-    public boolean registerBasin(BlockPos basinKey) {
+    public boolean registerBasin(BlockPos basinKey, Set<BlockPos> interior) {
         long key = basinKey.asLong();
+        FoundryBasinState state = basins.get(key);
 
-        if(basins.containsKey(key)) {
+        if (state != null) {
+            if(!state.getInterior().equals(interior)) {
+                state.setInterior(interior);
+                setDirty();
+            }
+
             return false;
         }
 
-        basins.put(key, new FoundryBasinState(70.0F));
+        state = new FoundryBasinState(70.0F);
+        state.setInterior(interior);
+
+        basins.put(key, state);
         setDirty();
 
         TrialMod.LOGGER.info(
-                "[Foundry] REgistered basin at {}",
-                basinKey
+                "[Foundry] Registered basin at {} with {} interior cells.",
+                basinKey, interior.size()
         );
 
         return true;
+    }
+
+    public Set<BlockPos> getInterior(BlockPos basinKey) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getInterior() : Set.of();
     }
 
     public boolean isRegistered(BlockPos basinKey) {
@@ -258,7 +270,12 @@ public class FoundryBasinSavedData extends SavedData {
 
             moltenAmountMb = Math.max(0, Math.min(moltenAmountMb, amountMb));
 
-            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb));
+            Set<BlockPos> interior = new HashSet<>();
+            for(long packedPos : basinTag.getLongArray("Interior")) {
+                interior.add(BlockPos.of(packedPos));
+            }
+
+            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior));
         }
 
         return data;
@@ -297,11 +314,14 @@ public class FoundryBasinSavedData extends SavedData {
         for (Map.Entry<Long, FoundryBasinState> entry : basins.entrySet()) {
             CompoundTag basinTag = new CompoundTag();
             FoundryBasinState state = entry.getValue();
+            long[] interiorPositions = state.getInterior().stream().mapToLong(pos -> pos.asLong())
+                            .toArray();
 
             basinTag.putLong("Key", entry.getKey());
             basinTag.putFloat("Temperature", state.getTemperature());
             basinTag.putInt("AmountMb", state.getAmountMb());
             basinTag.putInt("MoltenAmountMb", state.getMoltenAmountMb());
+            basinTag.putLongArray("Interior", interiorPositions);
 
             if (state.getMaterial() != null) {
                 basinTag.putString("Material", state.getMaterial().getSerializedName());

@@ -53,6 +53,7 @@ public class FoundryBasin {
             return Optional.empty();
         }
 
+        Set<BlockPos> interior = interiorResult.get();
         Optional<BlockPos> basinKeyResult = findBasinKey(interiorResult.get());
 
         if(basinKeyResult.isEmpty()) {
@@ -60,7 +61,7 @@ public class FoundryBasin {
         }
 
         BlockPos basinKey = basinKeyResult.get();
-        FoundryBasinSavedData.get(level).registerBasin(basinKey);
+        FoundryBasinSavedData.get(level).registerBasin(basinKey, interior);
 
         return Optional.of(basinKey);
     }
