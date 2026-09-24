@@ -15,28 +15,6 @@ public class FoundryMaterialForms {
     public static final int NUGGET_MB = 50;
 
 
-/*    public static Optional<FoundrySolidForm> fromBlockState(
-            BlockState state) {
-
-        for (FoundryMaterial material : FoundryMaterial.values()) {
-
-            if (state.is(material.getSolidifiedBlock())) {
-                return Optional.of(new FoundrySolidForm(material, BLOCK_MB));
-            }
-
-            if (state.is(material.getSolidifiedSlab())) {
-
-                SlabType slabType = state.getValue(SlabBlock.TYPE);
-
-                int amountMb = slabType == SlabType.DOUBLE ? BLOCK_MB : SLAB_MB;
-
-                return Optional.of(new FoundrySolidForm(material, amountMb));
-            }
-        }
-
-        return Optional.empty();
-    }*/
-
     public static Optional<FoundrySolidForm> getSolidForm(FoundryMaterial material, BlockState state) {
         if (state.is(material.getSolidifiedBlock())) {
             return Optional.of(new FoundrySolidForm(material, BLOCK_MB));

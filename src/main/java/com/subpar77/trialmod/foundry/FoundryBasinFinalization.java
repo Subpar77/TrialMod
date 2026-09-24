@@ -103,7 +103,7 @@ public class FoundryBasinFinalization {
         int amountToRemove = count * unitAmountMb;
 
         ItemStack stack = new ItemStack(item, count);
-        ItemEntity itemEntity = new ItemEntity(level, dropPos.getX() + 0.5, dropPos.getX() + 0.5,
+        ItemEntity itemEntity = new ItemEntity(level, dropPos.getX() + 0.5, dropPos.getY() + 0.5,
                 dropPos.getZ() + 0.5, stack);
 
         boolean spawned = level.addFreshEntity(itemEntity);

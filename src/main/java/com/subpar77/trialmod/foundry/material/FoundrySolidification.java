@@ -20,6 +20,12 @@ public final class FoundrySolidification {
 
     private FoundrySolidification() {}
 
+    private static final int BLOCK_MB = FoundryMaterialForms.BLOCK_MB;
+    private static final int SLAB_MB = FoundryMaterialForms.SLAB_MB;
+    private static final int CLUMP_MB = FoundryMaterialForms.CLUMP_MB;
+    private static final int NUGGET_MB = FoundryMaterialForms.NUGGET_MB;
+
+
     public static void process(ServerLevel level, BlockPos basinKey, Set<BlockPos> interior) {
 
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
@@ -35,7 +41,7 @@ public final class FoundrySolidification {
 
         int solidAmountMb = savedData.getSolidAmountMb(basinKey);
 
-        if (solidAmountMb < 500) {
+        if (solidAmountMb < SLAB_MB) {
             return;
         }
 
@@ -49,7 +55,7 @@ public final class FoundrySolidification {
 
         for (BlockPos pos : positions) {
 
-            if (solidAmountMb < 500) {
+            if (solidAmountMb < SLAB_MB) {
                 break;
             }
 
@@ -63,7 +69,7 @@ public final class FoundrySolidification {
 
             FoundrySolidForm form = formResult.get();
 
-            if (form.amountMb() != 500) {
+            if (form.amountMb() != SLAB_MB) {
                 continue;
             }
 
@@ -75,15 +81,15 @@ public final class FoundrySolidification {
                     pos,
                     state,
                     replacement,
-                    500)) {
+                    SLAB_MB)) {
 
-                solidAmountMb -= 500;
+                solidAmountMb -= SLAB_MB;
             }
         }
 
         for (BlockPos pos : positions) {
 
-            if (solidAmountMb < 1000) {
+            if (solidAmountMb < BLOCK_MB) {
                 break;
             }
 
@@ -95,12 +101,12 @@ public final class FoundrySolidification {
 
             BlockState slagBlock = material.getSolidifiedBlock().defaultBlockState();
 
-            if (transferSolidToWorld(level, basinKey, pos, currentState, slagBlock, 1000)) {
-                solidAmountMb -= 1000;
+            if (transferSolidToWorld(level, basinKey, pos, currentState, slagBlock, BLOCK_MB)) {
+                solidAmountMb -= BLOCK_MB;
             }
         }
 
-        if (solidAmountMb >= 500) {
+        if (solidAmountMb >= SLAB_MB) {
 
             for (BlockPos pos : positions) {
 
@@ -116,15 +122,15 @@ public final class FoundrySolidification {
                     slabState = slabState.setValue(SlabBlock.TYPE, SlabType.BOTTOM);
                 }
 
-                if (transferSolidToWorld(level, basinKey, pos, currentState, slabState, 500)) {
-                    solidAmountMb -= 500;
+                if (transferSolidToWorld(level, basinKey, pos, currentState, slabState, SLAB_MB)) {
+                    solidAmountMb -= SLAB_MB;
                 }
 
                 break;
             }
         }
 
-        if (solidAmountMb > 0 && solidAmountMb < 500) {
+        if (solidAmountMb > 0 && solidAmountMb < SLAB_MB) {
             TrialMod.LOGGER.info(
                     "[Foundry] Basin {} retained {} mB {} as solid residue.",
                     basinKey, solidAmountMb, material.getSerializedName()
