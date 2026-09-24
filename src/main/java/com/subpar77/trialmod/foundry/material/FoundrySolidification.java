@@ -22,8 +22,6 @@ public final class FoundrySolidification {
 
     private static final int BLOCK_MB = FoundryMaterialForms.BLOCK_MB;
     private static final int SLAB_MB = FoundryMaterialForms.SLAB_MB;
-    private static final int CLUMP_MB = FoundryMaterialForms.CLUMP_MB;
-    private static final int NUGGET_MB = FoundryMaterialForms.NUGGET_MB;
 
 
     public static void process(ServerLevel level, BlockPos basinKey, Set<BlockPos> interior) {

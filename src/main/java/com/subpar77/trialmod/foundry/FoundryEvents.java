@@ -79,10 +79,6 @@ public final class FoundryEvents {
                             }
                     }
 
-//                    TrialMod.LOGGER.debug(
-//                            "[Foundry] Basin {} breached for {} ticks ({} seconds). Walls={}, Floors={}",
-//                            basinKey, brokenTicks, brokenTicks / 20.0F, breach.wallBreaches(), breach.floorBreaches()
-//                    );
                 } else {
                     savedData.setBrokenTicks(basinKey, 0);
                 }

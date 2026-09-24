@@ -24,9 +24,6 @@ public class FoundryBasinFinalization {
             return savedData.getAmountMb(basinKey) == 0;
         }
 
-        int amountMb = savedData.getAmountMb(basinKey);
-
-
         if(hasMoltenMaterialNearby(level, rememberedInterior, material)) {
             return false;
         }

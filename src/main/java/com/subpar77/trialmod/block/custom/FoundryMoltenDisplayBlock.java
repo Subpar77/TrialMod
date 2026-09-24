@@ -29,8 +29,8 @@ public class FoundryMoltenDisplayBlock extends Block {
         super.entityInside(state, level, pos, entity
         );
 
-        if (!level.isClientSide ) {
-            entity.lavaHurt();
-        }
+//        if (!level.isClientSide ) {
+//            entity.lavaHurt();
+//        }
     }
 }

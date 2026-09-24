@@ -94,7 +94,7 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public void setTemperature(BlockPos basinKey, float temperature) {
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
         state.setTemperature(temperature);
 
         setDirty();
@@ -142,7 +142,7 @@ public class FoundryBasinSavedData extends SavedData {
             return false;
         }
 
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
         FoundryMaterial currentMaterial = state.getMaterial();
 
         if (currentMaterial != null && currentMaterial != material) {
@@ -180,7 +180,7 @@ public class FoundryBasinSavedData extends SavedData {
             return 0;
         }
 
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
         int convertedMb = Math.min(amountMb, state.getMoltenAmountMb());
 
         if(convertedMb <= 0) {
@@ -199,7 +199,7 @@ public class FoundryBasinSavedData extends SavedData {
             return 0;
         }
 
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
         int solidAmountMb = state.getSolidAmountMb();
         int convertedMb = Math.min(amountMb, solidAmountMb);
 
@@ -219,7 +219,7 @@ public class FoundryBasinSavedData extends SavedData {
             return false;
         }
 
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
 
         if(state.getMaterial() == null || state.getMoltenAmountMb() < amountMb) {
             return false;
@@ -342,7 +342,7 @@ public class FoundryBasinSavedData extends SavedData {
             return false;
         }
 
-        FoundryBasinState state = getOrCreate(basinKey);
+        FoundryBasinState state = basins.get(basinKey.asLong());
 
         if(state.getMaterial() == null || state.getSolidAmountMb() < amountMb) {
             return false;

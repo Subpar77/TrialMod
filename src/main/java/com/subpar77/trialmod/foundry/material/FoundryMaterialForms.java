@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 
 import java.util.Optional;
 
-public class FoundryMaterialForms {
+public final class FoundryMaterialForms {
     private FoundryMaterialForms() {}
 
     public static final int BLOCK_MB = 1000;
