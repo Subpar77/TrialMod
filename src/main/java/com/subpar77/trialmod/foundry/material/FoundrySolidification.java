@@ -55,7 +55,7 @@ public final class FoundrySolidification {
 
             BlockState state = level.getBlockState(pos);
 
-            Optional<FoundrySolidForm> formResult = material.getSolidForm(state);
+            Optional<FoundrySolidForm> formResult = FoundryMaterialForms.getSolidForm(material, state);
 
             if (formResult.isEmpty()) {
                 continue;

@@ -1,0 +1,8 @@
+{
+  "type": "trial_mod:foundry_melting",
+  "ingredient": {
+    "item": "trial_mod:copper_slag_nugget"
+  },
+  "material": "copper",
+  "amountMb": 50
+}

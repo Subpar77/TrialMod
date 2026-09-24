@@ -2,9 +2,11 @@ package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.material.FoundryMaterialForms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FluidState;
 
@@ -24,15 +26,33 @@ public class FoundryBasinFinalization {
 
         int amountMb = savedData.getAmountMb(basinKey);
 
-        if(amountMb < FoundryBasin.MB_PER_BUCKET) {
-            return false;
-        }
 
         if(hasMoltenMaterialNearby(level, rememberedInterior, material)) {
             return false;
         }
 
         BlockPos dropPos = findDropPosition(level, basinKey, rememberedInterior);
+
+        if(!physicalizeForm(level, basinKey, dropPos, material.getSolidifiedBlock().asItem(),
+                FoundryMaterialForms.BLOCK_MB)) {
+            return false;
+        }
+
+        if(!physicalizeForm(level, basinKey, dropPos, material.getSolidifiedSlab().asItem(),
+                FoundryMaterialForms.SLAB_MB)) {
+            return false;
+        }
+
+        if(!physicalizeForm(level, basinKey, dropPos, material.getSolidifiedClump(),
+                FoundryMaterialForms.CLUMP_MB)) {
+            return false;
+        }
+
+        if(!physicalizeForm(level, basinKey, dropPos, material.getSolidifiedNugget(),
+                FoundryMaterialForms.NUGGET_MB)) {
+            return false;
+        }
+
         ItemStack slagStack = new ItemStack(material.getSolidifiedBlock().asItem());
         ItemEntity itemEntity = new ItemEntity(level, dropPos.getX() + 0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5,
                 slagStack);
@@ -67,6 +87,56 @@ public class FoundryBasinFinalization {
         );
 
         return savedData.getAmountMb(basinKey) == 0;
+    }
+
+    private static boolean physicalizeForm(ServerLevel level, BlockPos basinKey, BlockPos dropPos, Item item, int unitAmountMb) {
+
+        FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
+
+        int availableMb = savedData.getAmountMb(basinKey);
+        int count = availableMb / unitAmountMb;
+
+        if(count <= 0) {
+            return true;
+        }
+
+        int amountToRemove = count * unitAmountMb;
+
+        ItemStack stack = new ItemStack(item, count);
+        ItemEntity itemEntity = new ItemEntity(level, dropPos.getX() + 0.5, dropPos.getX() + 0.5,
+                dropPos.getZ() + 0.5, stack);
+
+        boolean spawned = level.addFreshEntity(itemEntity);
+
+        if(!spawned) {
+            TrialMod.LOGGER.warn(
+                    "[Foundry] Failed to physicalize {} mB from basin {}.",
+                    amountToRemove, basinKey
+            );
+
+            return false;
+        }
+
+        boolean removed = savedData.tryRemoveMaterial(basinKey, amountToRemove);
+
+        if(!removed) {
+            itemEntity.discard();
+
+            TrialMod.LOGGER.error(
+                    "[Foundry] Failed to remove {} mB from basin {} during finalization.",
+                    amountToRemove, basinKey
+            );
+
+            return false;
+        }
+
+        TrialMod.LOGGER.info(
+                "[Foundry] Finalized {} mB from basin {} as {}x {}.",
+                amountToRemove, basinKey, count, item.getDescription().getString()
+        );
+
+        return true;
+
     }
 
     private static boolean hasMoltenMaterialNearby(ServerLevel level, Set<BlockPos> rememberedInterior, FoundryMaterial material) {

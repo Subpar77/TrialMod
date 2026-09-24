@@ -1,0 +1,8 @@
+{
+  "type": "trial_mod:foundry_melting",
+  "ingredient": {
+    "item": "minecraft:copper_ingot"
+  },
+  "material": "copper",
+  "amountMb": 25
+}

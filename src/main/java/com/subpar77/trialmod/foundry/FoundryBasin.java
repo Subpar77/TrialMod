@@ -1,6 +1,7 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.material.FoundryMaterialForms;
 import com.subpar77.trialmod.foundry.material.FoundrySolidForm;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -72,7 +73,7 @@ public class FoundryBasin {
 
         for(BlockPos pos : interior){
             BlockState state = level.getBlockState(pos);
-            Optional<FoundrySolidForm> solidForm = FoundryMaterial.fromSolidifiedState(state);
+            Optional<FoundrySolidForm> solidForm = FoundryMaterialForms.fromSolidifiedState(state);
 
             if(solidForm.isPresent()) {
                 totalMb += solidForm.get().amountMb();

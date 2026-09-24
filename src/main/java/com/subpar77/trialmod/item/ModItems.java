@@ -25,6 +25,11 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("foundry_tap", ModBlocks.FOUNDRY_TAP, new Item.Properties());
 
 
+
+    public static final DeferredItem<Item> COPPER_SLAG_CLUMP =
+            ITEMS.registerSimpleItem("copper_slag_clump", new Item.Properties());
+    public static final DeferredItem<Item> COPPER_SLAG_NUGGET =
+            ITEMS.registerSimpleItem("copper_slag_nugget", new Item.Properties());
     public static final DeferredItem<Item> MOLTEN_COPPER_BUCKET =
             ITEMS.register("molten_copper_bucket", ()-> new BucketItem(ModFluids.MOLTEN_COPPER_SOURCE.get(),
                     new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));

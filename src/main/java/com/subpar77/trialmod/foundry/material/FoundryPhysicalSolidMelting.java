@@ -22,7 +22,7 @@ public class FoundryPhysicalSolidMelting {
 
         for(BlockPos pos : interior) {
             BlockState state = level.getBlockState(pos);
-            Optional<FoundrySolidForm> formResult = FoundryMaterial.fromSolidifiedState(state);
+            Optional<FoundrySolidForm> formResult = FoundryMaterialForms.fromSolidifiedState(state);
 
             if(formResult.isEmpty()) {
                 continue;

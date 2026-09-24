@@ -2,6 +2,7 @@ package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.block.custom.FoundryMoltenDisplayBlock;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.material.FoundryMaterialForms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -94,7 +95,7 @@ public class FoundryStructure {
             return true;
         }
 
-        return FoundryMaterial.fromSolidifiedState(state).isPresent();
+        return FoundryMaterialForms.fromSolidifiedState(state).isPresent();
     }
 
     private static boolean isValidFoundryFloor(BlockState state) {

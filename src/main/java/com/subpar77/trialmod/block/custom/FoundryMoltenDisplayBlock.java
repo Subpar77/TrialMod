@@ -1,7 +1,9 @@
 package com.subpar77.trialmod.block.custom;
 
+import com.subpar77.trialmod.TrialMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,8 +31,8 @@ public class FoundryMoltenDisplayBlock extends Block {
         super.entityInside(state, level, pos, entity
         );
 
-        if (!level.isClientSide) {
-            entity.lavaHurt();
-        }
+//        if (!level.isClientSide ) {
+//            entity.lavaHurt();
+//        }
     }
 }

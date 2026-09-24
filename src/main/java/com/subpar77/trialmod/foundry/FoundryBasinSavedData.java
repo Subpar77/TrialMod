@@ -238,6 +238,34 @@ public class FoundryBasinSavedData extends SavedData {
         return true;
     }
 
+    public boolean tryRemoveMaterial(BlockPos basinKey, int amountMb) {
+
+        if (amountMb <= 0) {
+            return false;
+        }
+
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if (state == null || state.getMaterial() == null || state.getAmountMb() < amountMb) {
+            return false;
+        }
+
+        int moltenRemoved = Math.min(amountMb, state.getMoltenAmountMb());
+
+        state.setMoltenAmountMb(state.getMoltenAmountMb() - moltenRemoved);
+
+        state.setAmountMb(state.getAmountMb() - amountMb);
+
+        if (state.getAmountMb() == 0) {
+            state.setMaterial(null);
+            state.setMoltenAmountMb(0);
+        }
+
+        setDirty();
+
+        return true;
+    }
+
     public int getMoltenAmountMb(BlockPos basinKey) {
         FoundryBasinState state = basins.get(basinKey.asLong());
 
