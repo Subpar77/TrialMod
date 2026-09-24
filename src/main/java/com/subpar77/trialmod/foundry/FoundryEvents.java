@@ -19,6 +19,8 @@ public final class FoundryEvents {
 
     private FoundryEvents() {}
 
+    public static final int BASIN_FAILURE_TICKS = 20 * 30;
+
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel level)) {
@@ -57,6 +59,21 @@ public final class FoundryEvents {
 
                         savedData.removeBasin(basinKey);
                         continue;
+                    }
+
+                    if(savedData.getBrokenTicks(basinKey) >= BASIN_FAILURE_TICKS) {
+
+                        boolean finalized = FoundryBasinFinalization.finalizeBasin(level, basinKey, rememberedInterior);
+
+                            if(finalized) {
+                                TrialMod.LOGGER.info(
+                                        "[Foundry] Deregistering finalized basin {}.",
+                                        basinKey
+                                );
+
+                                savedData.removeBasin(basinKey);
+                                continue;
+                            }
                     }
 
 //                    TrialMod.LOGGER.debug(
