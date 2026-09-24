@@ -50,6 +50,7 @@ public final class FoundryEvents {
                     savedData.setBrokenTicks(basinKey, brokenTicks);
 
                     FoundryBasinSpill.attemptSpill(level, basinKey, rememberedInterior, breach);
+                    FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
 
                     if(savedData.getAmountMb(basinKey) == 0) {
                         TrialMod.LOGGER.info(
@@ -66,6 +67,8 @@ public final class FoundryEvents {
                         boolean finalized = FoundryBasinFinalization.finalizeBasin(level, basinKey, rememberedInterior);
 
                             if(finalized) {
+                                FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
+
                                 TrialMod.LOGGER.info(
                                         "[Foundry] Deregistering finalized basin {}.",
                                         basinKey
