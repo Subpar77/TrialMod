@@ -49,6 +49,16 @@ public final class FoundryEvents {
 
                     FoundryBasinSpill.attemptSpill(level, basinKey, rememberedInterior, breach);
 
+                    if(savedData.getAmountMb(basinKey) == 0) {
+                        TrialMod.LOGGER.info(
+                                "[Foundry] Deregistering empty breached basin {}.",
+                                basinKey
+                        );
+
+                        savedData.removeBasin(basinKey);
+                        continue;
+                    }
+
 //                    TrialMod.LOGGER.debug(
 //                            "[Foundry] Basin {} breached for {} ticks ({} seconds). Walls={}, Floors={}",
 //                            basinKey, brokenTicks, brokenTicks / 20.0F, breach.wallBreaches(), breach.floorBreaches()
