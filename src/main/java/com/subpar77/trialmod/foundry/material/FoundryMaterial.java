@@ -96,7 +96,7 @@ public enum FoundryMaterial implements StringRepresentable {
     public static Optional<FoundryMaterial> fromFluid(Fluid fluid) {
         for (FoundryMaterial material : values()) {
 
-            if (material.getMoltenFluid() == fluid) {
+            if (material.getMoltenFluid().isSame(fluid)) {
                 return Optional.of(material);
             }
         }

@@ -30,12 +30,7 @@ public class FoundryBasinState {
 
     public FoundryBasinState(float temperature, @Nullable FoundryMaterial material, int amountMb, int moltenAmountMb,
                              Set<BlockPos> interior) {
-         this.temperature = temperature;
-         this.material = material;
-         this.amountMb = amountMb;
-         this.moltenAmountMb = moltenAmountMb;
-
-         setInterior(interior);
+         this(temperature, material, amountMb, moltenAmountMb, interior, 0);
     }
 
     public FoundryBasinState(float temperature, @Nullable FoundryMaterial material, int amountMb, int moltenAmountMb,

@@ -47,10 +47,12 @@ public final class FoundryEvents {
                     int brokenTicks = savedData.getBrokenTicks(basinKey) + 20;
                     savedData.setBrokenTicks(basinKey, brokenTicks);
 
-                    TrialMod.LOGGER.debug(
-                            "[Foundry] Basin {} breached for {} ticks ({} seconds). Walls={}, Floors={}",
-                            basinKey, brokenTicks, brokenTicks / 20.0F, breach.wallBreaches(), breach.floorBreaches()
-                    );
+                    FoundryBasinSpill.attemptSpill(level, basinKey, rememberedInterior, breach);
+
+//                    TrialMod.LOGGER.debug(
+//                            "[Foundry] Basin {} breached for {} ticks ({} seconds). Walls={}, Floors={}",
+//                            basinKey, brokenTicks, brokenTicks / 20.0F, breach.wallBreaches(), breach.floorBreaches()
+//                    );
                 } else {
                     savedData.setBrokenTicks(basinKey, 0);
                 }
