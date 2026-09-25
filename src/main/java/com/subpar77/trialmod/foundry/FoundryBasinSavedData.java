@@ -24,7 +24,7 @@ public class FoundryBasinSavedData extends SavedData {
         FoundryBasinState state = basins.get(key);
 
         if (state != null) {
-            if(!state.getInterior().equals(interior)) {
+            if (!state.getInterior().equals(interior)) {
                 state.setInterior(interior);
                 setDirty();
             }
@@ -55,13 +55,13 @@ public class FoundryBasinSavedData extends SavedData {
     public void setBrokenTicks(BlockPos basinKey, int brokenTicks) {
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null) {
+        if (state == null) {
             return;
         }
 
         int newValue = Math.max(0, brokenTicks);
 
-        if(state.getBrokenTicks() == newValue) {
+        if (state.getBrokenTicks() == newValue) {
             return;
         }
 
@@ -82,7 +82,7 @@ public class FoundryBasinSavedData extends SavedData {
     public void setTemperature(BlockPos basinKey, float temperature) {
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null) {
+        if (state == null) {
             return;
         }
 
@@ -134,7 +134,7 @@ public class FoundryBasinSavedData extends SavedData {
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null) {
+        if (state == null) {
             return false;
         }
 
@@ -171,19 +171,19 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public int solidifyMaterial(BlockPos basinKey, int amountMb) {
-        if(amountMb <= 0) {
+        if (amountMb <= 0) {
             return 0;
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null) {
+        if (state == null) {
             return 0;
         }
 
         int convertedMb = Math.min(amountMb, state.getMoltenAmountMb());
 
-        if(convertedMb <= 0) {
+        if (convertedMb <= 0) {
             return 0;
         }
 
@@ -195,20 +195,20 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public int meltMaterial(BlockPos basinKey, int amountMb) {
-        if(amountMb <= 0) {
+        if (amountMb <= 0) {
             return 0;
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null) {
+        if (state == null) {
             return 0;
         }
 
         int solidAmountMb = state.getSolidAmountMb();
         int convertedMb = Math.min(amountMb, solidAmountMb);
 
-        if(convertedMb <= 0) {
+        if (convertedMb <= 0) {
             return 0;
         }
 
@@ -220,20 +220,20 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public boolean tryRemoveMoltenMaterial(BlockPos basinKey, int amountMb) {
-        if(amountMb <= 0) {
+        if (amountMb <= 0) {
             return false;
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null || state.getMoltenAmountMb() < amountMb || state.getMaterial() == null) {
+        if (state == null || state.getMoltenAmountMb() < amountMb || state.getMaterial() == null) {
             return false;
         }
 
         state.setAmountMb(state.getAmountMb() - amountMb);
         state.setMoltenAmountMb(state.getMoltenAmountMb() - amountMb);
 
-        if(state.getAmountMb() == 0) {
+        if (state.getAmountMb() == 0) {
             state.setMaterial(null);
             state.setMoltenAmountMb(0);
         }
@@ -283,6 +283,27 @@ public class FoundryBasinSavedData extends SavedData {
         return state != null ? state.getSolidAmountMb() : 0;
     }
 
+    public @Nullable BlockPos getLastSpillPos(BlockPos basinKey) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getLastSpillPos() : null;
+    }
+
+    public void setLastSpillPos(BlockPos basinKey, @Nullable BlockPos lastSpillPos) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if (state == null) {
+            return;
+        }
+
+        if(Objects.equals(state.getLastSpillPos(), lastSpillPos)) {
+            return;
+        }
+
+        state.setLastSpillPos(lastSpillPos);
+        setDirty();
+    }
+
     public static FoundryBasinSavedData load(CompoundTag tag, HolderLookup.Provider registries) {
         FoundryBasinSavedData data = new FoundryBasinSavedData();
 
@@ -296,7 +317,7 @@ public class FoundryBasinSavedData extends SavedData {
             int amountMb = basinTag.getInt("AmountMb");
             int moltenAmountMb;
 
-            if(basinTag.contains("MoltenAmountMb", Tag.TAG_INT)) {
+            if (basinTag.contains("MoltenAmountMb", Tag.TAG_INT)) {
                 moltenAmountMb = basinTag.getInt("MoltenAmountMb");
             } else {
                 moltenAmountMb = amountMb;
@@ -309,7 +330,7 @@ public class FoundryBasinSavedData extends SavedData {
 
                 Optional<FoundryMaterial> loadedMaterial = FoundryMaterial.fromSerializedName(materialName);
 
-                if(loadedMaterial.isPresent()) {
+                if (loadedMaterial.isPresent()) {
                     material = loadedMaterial.get();
                 } else {
                     TrialMod.LOGGER.warn(
@@ -327,15 +348,33 @@ public class FoundryBasinSavedData extends SavedData {
             moltenAmountMb = Math.max(0, Math.min(moltenAmountMb, amountMb));
 
             Set<BlockPos> interior = new HashSet<>();
-            for(long packedPos : basinTag.getLongArray("Interior")) {
+            for (long packedPos : basinTag.getLongArray("Interior")) {
                 interior.add(BlockPos.of(packedPos));
             }
 
             int brokenTicks = basinTag.contains("BrokenTicks", Tag.TAG_INT) ?
                     basinTag.getInt("BrokenTicks") : 0;
 
-            data.basins.put(key, new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior,
-                    brokenTicks));
+            BlockPos lastSpillPos = null;
+
+            if(basinTag.contains("LastSpillPos", Tag.TAG_LONG)) {
+                lastSpillPos = BlockPos.of(basinTag.getLong("LastSpillPos"));
+            }
+
+            FoundryBasinState state = new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior,
+                    brokenTicks);
+            state.setLastSpillPos(lastSpillPos);
+
+            //Temp Debug
+            if(lastSpillPos != null) {
+                TrialMod.LOGGER.info(
+                "[Foundry] Loaded last spill position {} for basin {}.",
+                        lastSpillPos, BlockPos.of(key)
+                );
+            }
+            //END
+
+            data.basins.put(key, state);
         }
 
         return data;
@@ -343,19 +382,19 @@ public class FoundryBasinSavedData extends SavedData {
 
     public boolean tryRemoveSolidMaterial(BlockPos basinKey, int amountMb) {
 
-        if(amountMb <= 0) {
+        if (amountMb <= 0) {
             return false;
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state == null || state.getSolidAmountMb() < amountMb || state.getMaterial() == null) {
+        if (state == null || state.getSolidAmountMb() < amountMb || state.getMaterial() == null) {
             return false;
         }
 
         state.setAmountMb(state.getAmountMb() - amountMb);
 
-        if(state.getAmountMb() == 0) {
+        if (state.getAmountMb() == 0) {
             state.setMaterial(null);
             state.setMoltenAmountMb(0);
         }
@@ -375,7 +414,8 @@ public class FoundryBasinSavedData extends SavedData {
             CompoundTag basinTag = new CompoundTag();
             FoundryBasinState state = entry.getValue();
             long[] interiorPositions = state.getInterior().stream().mapToLong(pos -> pos.asLong())
-                            .toArray();
+                    .toArray();
+            BlockPos lastSpillPos = state.getLastSpillPos();
 
             basinTag.putLong("Key", entry.getKey());
             basinTag.putFloat("Temperature", state.getTemperature());
@@ -386,6 +426,10 @@ public class FoundryBasinSavedData extends SavedData {
 
             if (state.getMaterial() != null) {
                 basinTag.putString("Material", state.getMaterial().getSerializedName());
+            }
+
+            if (lastSpillPos != null) {
+                basinTag.putLong("LastSpillPos", lastSpillPos.asLong());
             }
 
             basinList.add(basinTag);

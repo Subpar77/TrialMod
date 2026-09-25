@@ -59,16 +59,14 @@ public final class FoundryBasinSpill {
             return false;
         }
 
-        TrialMod.LOGGER.info(
-                "[Foundry] Basin {} spilled {} mB {} at {}. Remaining molten={} mB.",
-                basinKey, SPILL_AMOUNT_MB, material.getSerializedName(), targetPos, savedData.getMoltenAmountMb(basinKey)
-        );
+        savedData.setLastSpillPos(basinKey, targetPos);
 
         return true;
     }
 
     private static Optional<BlockPos> findSpillPosition(ServerLevel level, FoundryMaterial material,
                                                         Set<BlockPos> interior, FoundryBasinBreach.Result breach) {
+
         Queue<BlockPos> toCheck = new PriorityQueue<>(Comparator.comparingInt((BlockPos pos)-> pos.getY())
                 .thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ));
         Set<BlockPos> visited = new HashSet<>();

@@ -8,8 +8,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
+import java.util.Optional;
 import java.util.Set;
 
 public class FoundryBasinFinalization {
@@ -29,6 +32,47 @@ public class FoundryBasinFinalization {
         }
 
         BlockPos dropPos = findDropPosition(level, basinKey, rememberedInterior);
+        int remainingMb = savedData.getAmountMb(basinKey);
+
+        if(remainingMb < FoundryMaterialForms.BLOCK_MB && remainingMb >= FoundryMaterialForms.SLAB_MB) {
+
+            BlockPos lastSpillPos = savedData.getLastSpillPos(basinKey);
+
+            if(lastSpillPos != null) {
+                Optional<BlockPos> slabPos = findSlabPlacementPosition(level, lastSpillPos, rememberedInterior);
+
+                if(slabPos.isPresent()) {
+                    BlockPos placementPos = slabPos.get();
+                    BlockState oldState = level.getBlockState(placementPos);
+                    BlockState slabState = material.getSolidifiedSlab().defaultBlockState();
+
+                    boolean placed = level.setBlock(placementPos, slabState, Block.UPDATE_ALL);
+
+                    if (placed) {
+                        boolean removed = savedData.tryRemoveMaterial(basinKey, FoundryMaterialForms.SLAB_MB);
+
+                        if (!removed) {
+                            level.setBlock(placementPos, oldState, Block.UPDATE_ALL);
+
+                            TrialMod.LOGGER.error(
+                                    "[Foundry] Failed to remove {} mB {} after place slag slab for basin {}.",
+                                    FoundryMaterialForms.SLAB_MB, material.getSerializedName(), basinKey
+                            );
+
+                            return false;
+
+                        }
+
+
+                        TrialMod.LOGGER.info(
+                                "[Foundry] Finalized {} mB {} from basin {} as a slag slab at {}.",
+                                FoundryMaterialForms.SLAB_MB, material.getSerializedName(), basinKey, placementPos
+                        );
+
+                    }
+                }
+            }
+        }
 
         if(!physicalizeForm(level, basinKey, dropPos, material.getSolidifiedBlock().asItem(),
                 FoundryMaterialForms.BLOCK_MB)) {
@@ -49,39 +93,6 @@ public class FoundryBasinFinalization {
                 FoundryMaterialForms.NUGGET_MB)) {
             return false;
         }
-
-        ItemStack slagStack = new ItemStack(material.getSolidifiedBlock().asItem());
-        ItemEntity itemEntity = new ItemEntity(level, dropPos.getX() + 0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5,
-                slagStack);
-
-        boolean spawned = level.addFreshEntity(itemEntity);
-
-        if(!spawned) {
-            TrialMod.LOGGER.warn(
-            "[Foundry] Failed to physicalize 1000 mB {} from basin {}",
-                    material.getSerializedName(), basinKey
-            );
-
-            return false;
-        }
-
-        boolean removed = savedData.tryRemoveMoltenMaterial(basinKey, FoundryBasin.MB_PER_BUCKET);
-
-        if(!removed) {
-            itemEntity.discard();
-
-            TrialMod.LOGGER.error(
-                    "[Foundry] Failed to remove 1000 mB {} from basin {} during finalization.",
-                    material.getSerializedName(), basinKey
-            );
-
-            return false;
-        }
-
-        TrialMod.LOGGER.info(
-                "[Foundry] Finalized 1000 mB {} from basin {} as recoverable slag at {}.",
-                material.getSerializedName(), basinKey, dropPos
-        );
 
         return savedData.getAmountMb(basinKey) == 0;
     }
@@ -181,4 +192,24 @@ public class FoundryBasinFinalization {
 
         return basinKey.immutable();
     }
+
+    private static Optional<BlockPos> findSlabPlacementPosition(ServerLevel level, BlockPos lastSpillPos,
+                                                                Set<BlockPos> rememberedInterior) {
+
+        BlockPos[] candidates = {lastSpillPos.below(), lastSpillPos.north(), lastSpillPos.south(), lastSpillPos.east(),
+        lastSpillPos.west()};
+
+        for (BlockPos candidate : candidates) {
+            if(rememberedInterior.contains(candidate)) {
+                continue;
+            }
+
+            if(level.getBlockState(candidate).isAir()) {
+                return Optional.of(candidate.immutable());
+            }
+        }
+
+        return Optional.empty();
+    }
+
 }

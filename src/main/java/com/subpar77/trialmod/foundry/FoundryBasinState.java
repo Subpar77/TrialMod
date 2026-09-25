@@ -14,6 +14,9 @@ public class FoundryBasinState {
     @Nullable
     private FoundryMaterial material;
 
+    @Nullable
+    private BlockPos lastSpillPos;
+
     private int amountMb;
     private int moltenAmountMb;
     private int brokenTicks;
@@ -42,6 +45,14 @@ public class FoundryBasinState {
          this.brokenTicks = Math.max(0, brokenTicks);
          setInterior(interior);
 
+    }
+
+    public @Nullable BlockPos getLastSpillPos() {
+        return lastSpillPos;
+    }
+
+    public void setLastSpillPos(@Nullable BlockPos lastSpillPos) {
+        this.lastSpillPos = lastSpillPos != null ? lastSpillPos.immutable() : null;
     }
 
     public Set<BlockPos> getInterior() {

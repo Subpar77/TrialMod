@@ -1,10 +1,7 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.TrialMod;
-import com.subpar77.trialmod.foundry.material.FoundryItemMelting;
-import com.subpar77.trialmod.foundry.material.FoundryPhaseTransitions;
-import com.subpar77.trialmod.foundry.material.FoundryPhysicalSolidMelting;
-import com.subpar77.trialmod.foundry.material.FoundrySolidification;
+import com.subpar77.trialmod.foundry.material.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,6 +17,7 @@ public final class FoundryEvents {
     private FoundryEvents() {}
 
     public static final int BASIN_FAILURE_TICKS = 20 * 30;
+    public static final int BASIN_ABANDONMENT_TICKS = 24_000;
 
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
@@ -79,6 +77,44 @@ public final class FoundryEvents {
                             }
                     }
 
+                    int remainingMb = savedData.getAmountMb(basinKey);
+
+                    if(savedData.getBrokenTicks(basinKey) >= BASIN_ABANDONMENT_TICKS && remainingMb > 0
+                            && remainingMb < FoundryMaterialForms.NUGGET_MB) {
+
+                        FoundryMaterial material = savedData.getMaterial(basinKey);
+
+                        if (material == null) {
+                            TrialMod.LOGGER.error(
+                                    "[Foundry] Abandoned basin {} contains {} mB but has no material assigned.",
+                                    basinKey, remainingMb
+                            );
+
+                            continue;
+                        }
+
+                        boolean discarded = savedData.tryRemoveMaterial(basinKey, remainingMb);
+
+                        if(!discarded) {
+                            TrialMod.LOGGER.error(
+                                    "[Foundry] Failed to discard {} mB {} residue from abandoned basin {}.",
+                                    remainingMb, material.getSerializedName(), basinKey
+                            );
+
+                            continue;
+                        }
+
+                        TrialMod.LOGGER.warn(
+                                "[Foundry] Discarded {} mB unrepresentable {} residue from abandoned basin {} after one Minecraft day.",
+                                remainingMb, material, basinKey
+                        );
+
+                        FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
+
+                        savedData.removeBasin(basinKey);
+                        continue;
+                    }
+
                 } else {
                     savedData.setBrokenTicks(basinKey, 0);
                 }
@@ -101,6 +137,8 @@ public final class FoundryEvents {
                 );
 
                 savedData.setBrokenTicks(basinKey, 0);
+                savedData.setLastSpillPos(basinKey, null);
+
             }
 
             Optional<HeatSourceData> heat = FoundryHeat.inspect(level, interior.get());
