@@ -19,20 +19,6 @@ public class FoundryBasinSavedData extends SavedData {
 
     private final Map<Long, FoundryBasinState> basins = new HashMap<>();
 
-    public FoundryBasinState getOrCreate(BlockPos basinKey) {
-        long key = basinKey.asLong();
-
-        FoundryBasinState state = basins.get(key);
-
-        if (state == null) {
-            state = new FoundryBasinState(70.0F);
-            basins.put(key, state);
-            setDirty();
-        }
-
-        return state;
-    }
-
     public boolean registerBasin(BlockPos basinKey, Set<BlockPos> interior) {
         long key = basinKey.asLong();
         FoundryBasinState state = basins.get(key);
@@ -95,8 +81,12 @@ public class FoundryBasinSavedData extends SavedData {
 
     public void setTemperature(BlockPos basinKey, float temperature) {
         FoundryBasinState state = basins.get(basinKey.asLong());
-        state.setTemperature(temperature);
 
+        if(state == null) {
+            return;
+        }
+
+        state.setTemperature(temperature);
         setDirty();
     }
 
@@ -143,6 +133,11 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if(state == null) {
+            return false;
+        }
+
         FoundryMaterial currentMaterial = state.getMaterial();
 
         if (currentMaterial != null && currentMaterial != material) {
@@ -181,6 +176,11 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if(state == null) {
+            return 0;
+        }
+
         int convertedMb = Math.min(amountMb, state.getMoltenAmountMb());
 
         if(convertedMb <= 0) {
@@ -200,6 +200,11 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         FoundryBasinState state = basins.get(basinKey.asLong());
+
+        if(state == null) {
+            return 0;
+        }
+
         int solidAmountMb = state.getSolidAmountMb();
         int convertedMb = Math.min(amountMb, solidAmountMb);
 
@@ -221,7 +226,7 @@ public class FoundryBasinSavedData extends SavedData {
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state.getMaterial() == null || state.getMoltenAmountMb() < amountMb) {
+        if(state == null || state.getMoltenAmountMb() < amountMb || state.getMaterial() == null) {
             return false;
         }
 
@@ -344,7 +349,7 @@ public class FoundryBasinSavedData extends SavedData {
 
         FoundryBasinState state = basins.get(basinKey.asLong());
 
-        if(state.getMaterial() == null || state.getSolidAmountMb() < amountMb) {
+        if(state == null || state.getSolidAmountMb() < amountMb || state.getMaterial() == null) {
             return false;
         }
 
