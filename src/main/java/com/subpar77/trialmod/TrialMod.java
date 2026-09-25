@@ -1,8 +1,13 @@
 package com.subpar77.trialmod;
 
 import com.subpar77.trialmod.block.ModBlocks;
+import com.subpar77.trialmod.block.entity.ModBlockEntities;
+import com.subpar77.trialmod.client.ClientModEvents;
+import com.subpar77.trialmod.fluid.ModFluids;
+import com.subpar77.trialmod.foundry.recipe.ModFoundryRecipes;
 import com.subpar77.trialmod.item.ModItems;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import org.slf4j.Logger;
 
@@ -28,7 +33,17 @@ public class TrialMod {
 
         // Register the Deferred Register to the mod event bus so items get registered
         ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModItems.register(modEventBus);
+        ModFluids.register(modEventBus);
+        ModCreativeTabs.register(modEventBus);
+        ModFoundryRecipes.register(modEventBus);
+
+
+        if (FMLEnvironment.dist.isClient()) {
+            modEventBus.addListener(ClientModEvents::registerClientExtensions);
+        }
+
 
 
     }
@@ -36,6 +51,9 @@ public class TrialMod {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
+            event.accept(ModItems.TAP_BLOCK_ITEM.get());
+            event.accept(ModItems.MOLTEN_COPPER_BUCKET.get());
+            event.accept(ModBlocks.COPPER_SLAG_BLOCK.get());
         }
     }
 }

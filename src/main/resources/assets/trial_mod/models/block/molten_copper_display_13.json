@@ -1,0 +1,21 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "molten": "trial_mod:block/molten_copper_still",
+    "particle": "trial_mod:block/molten_copper_still"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 13, 16],
+      "faces": {
+        "down":  { "texture": "#molten" },
+        "up":    { "texture": "#molten" },
+        "north": { "texture": "#molten" },
+        "south": { "texture": "#molten" },
+        "west":  { "texture": "#molten" },
+        "east":  { "texture": "#molten" }
+      }
+    }
+  ]
+}

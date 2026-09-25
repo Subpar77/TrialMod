@@ -1,0 +1,8 @@
+{
+  "type": "trial_mod:foundry_melting",
+  "ingredient": {
+    "item": "trial_mod:copper_slag_slab"
+  },
+  "material": "copper",
+  "amountMb": 500
+}

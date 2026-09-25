@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "trial_mod:item/molten_copper_bucket"
+  }
+}

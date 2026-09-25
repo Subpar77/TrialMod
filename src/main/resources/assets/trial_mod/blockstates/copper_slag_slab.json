@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "trial_mod:block/copper_slag_slab"
+    },
+    "type=top": {
+      "model": "trial_mod:block/copper_slag_slab_top"
+    },
+    "type=double": {
+      "model": "trial_mod:block/copper_slag_block"
+    }
+  }
+}

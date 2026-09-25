@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "trial_mod:block/foundry_tap"
+    },
+    "facing=east": {
+      "model": "trial_mod:block/foundry_tap",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "trial_mod:block/foundry_tap",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "trial_mod:block/foundry_tap",
+      "y": 270
+    }
+  }
+}
