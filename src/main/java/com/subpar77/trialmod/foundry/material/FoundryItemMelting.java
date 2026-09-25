@@ -96,4 +96,15 @@ public class FoundryItemMelting {
             return;
         }
     }
+
+    public static boolean isMeltable(ServerLevel level, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
+
+        SingleRecipeInput input = new SingleRecipeInput(stack);
+
+        return level.getRecipeManager().getRecipeFor(ModFoundryRecipes.FOUNDRY_MELTING_TYPE.get(),
+                input, level).isPresent();
+    }
 }
