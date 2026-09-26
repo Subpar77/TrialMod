@@ -18,7 +18,8 @@ public class ModBlocks {
 
     public static final DeferredBlock<FoundryBrickBlock> FOUNDRY_BRICK =
             BLOCKS.registerBlock("foundry_brick", FoundryBrickBlock::new,
-                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops());
+                    BlockBehaviour.Properties.of().strength(2.0F, 8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()
+                            .noOcclusion());
 
     public static final DeferredBlock<FoundryCopperSlagBlock> COPPER_SLAG_BLOCK =
             BLOCKS.registerBlock("copper_slag_block", FoundryCopperSlagBlock::new,
