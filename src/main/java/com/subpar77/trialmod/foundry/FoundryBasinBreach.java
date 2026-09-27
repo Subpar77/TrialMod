@@ -29,10 +29,9 @@ public class FoundryBasinBreach {
         for(BlockPos interiorPos : interior) {
             BlockPos floorPos = interiorPos.below();
 
-            if(!level.getBlockState(floorPos).is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
+            if (!FoundryStructure.isValidBasinFloor(level.getBlockState(floorPos))) {
                 floorBreaches.add(floorPos.immutable());
             }
-
 
 
             for(Direction direction : new Direction[] {
@@ -44,8 +43,7 @@ public class FoundryBasinBreach {
                     continue;
                 }
 
-                if(!level.getBlockState(neighborPos).is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
-
+                if (!FoundryStructure.isValidBasinWall(level.getBlockState(neighborPos))) {
                     wallBreaches.add(neighborPos.immutable());
                 }
             }

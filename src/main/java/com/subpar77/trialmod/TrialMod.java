@@ -50,7 +50,7 @@ public class TrialMod {
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
-            event.accept(ModItems.FOUNDRY_BRICK_ITEM.get());
+            event.accept(ModItems.STONE_BASIN_WALL.get());
             event.accept(ModItems.TAP_BLOCK_ITEM.get());
             event.accept(ModItems.MOLTEN_COPPER_BUCKET.get());
             event.accept(ModBlocks.COPPER_SLAG_BLOCK.get());

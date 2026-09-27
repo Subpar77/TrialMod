@@ -1,12 +1,13 @@
 package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.block.custom.FoundryMoltenDisplayBlock;
-import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import com.subpar77.trialmod.foundry.material.FoundryMaterialForms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.SlabType;
 
 import java.util.*;
 
@@ -34,17 +35,17 @@ public class FoundryStructure {
             }
 
             BlockPos floorPos = currentPos.below();
-            if(!isValidFoundryFloor(level.getBlockState(floorPos))) {
+            if (!isValidBasinFloor(level.getBlockState(floorPos))) {
                 return Optional.empty();
             }
 
-            for (Direction direction : new Direction[] {
-                Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+            for (Direction direction : new Direction[]{
+                    Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
 
                 BlockPos neighborPos = currentPos.relative(direction);
                 BlockState neighborState = level.getBlockState(neighborPos);
 
-                if (neighborState.is(ModBlockTags.VALID_FOUNDRY_BLOCKS)) {
+                if (neighborState.is(ModBlockTags.VALID_BASIN_WALLS)) {
                     continue;
                 }
 
@@ -98,7 +99,22 @@ public class FoundryStructure {
         return FoundryMaterialForms.fromSolidifiedState(state).isPresent();
     }
 
-    private static boolean isValidFoundryFloor(BlockState state) {
-        return state.is(ModBlockTags.VALID_FOUNDRY_BLOCKS);
+    static boolean isValidBasinFloor(BlockState state) {
+
+        if (!state.is(ModBlockTags.VALID_BASIN_FLOORS)) {
+            return false;
+        }
+
+        if (state.getBlock() instanceof SlabBlock) {SlabType slabType = state.getValue(SlabBlock.TYPE);
+
+            return slabType == SlabType.TOP
+                    || slabType == SlabType.DOUBLE;
+        }
+
+        return true;
+    }
+
+    static boolean isValidBasinWall(BlockState state) {
+        return state.is(ModBlockTags.VALID_BASIN_WALLS);
     }
 }

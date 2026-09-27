@@ -15,8 +15,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class ModItems {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(TrialMod.MODID);
 
-    public static final DeferredItem<BlockItem> FOUNDRY_BRICK_ITEM =
+    public static final DeferredItem<BlockItem> STONE_BASIN_WALL =
+            ITEMS.registerSimpleBlockItem("stone_basin_wall", ModBlocks.STONE_BASIN_WALL, new Item.Properties());
+    public static final DeferredItem<BlockItem> FOUNDRY_BRICK =
             ITEMS.registerSimpleBlockItem("foundry_brick", ModBlocks.FOUNDRY_BRICK, new Item.Properties());
+    public static final DeferredItem<BlockItem> FOUNDRY_BRICK_SLAB_ITEM =
+            ITEMS.registerSimpleBlockItem("foundry_brick_slab", ModBlocks.FOUNDRY_BRICK_SLAB, new Item.Properties());
     public static final DeferredItem<BlockItem> COPPER_SLAG_ITEM =
             ITEMS.registerSimpleBlockItem("copper_slag_block",ModBlocks.COPPER_SLAG_BLOCK, new Item.Properties());
     public static final DeferredItem<BlockItem> COPPER_SLAG_SLAB_ITEM =

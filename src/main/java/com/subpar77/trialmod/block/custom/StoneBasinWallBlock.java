@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.state.properties.StairsShape;
 import org.jetbrains.annotations.Nullable;
 
 
-public class FoundryBrickBlock extends HorizontalDirectionalBlock {
-    public static final MapCodec<FoundryBrickBlock> CODEC = simpleCodec(FoundryBrickBlock::new);
+public class StoneBasinWallBlock extends HorizontalDirectionalBlock {
+    public static final MapCodec<StoneBasinWallBlock> CODEC = simpleCodec(StoneBasinWallBlock::new);
 
     public static final EnumProperty<StairsShape> SHAPE = BlockStateProperties.STAIRS_SHAPE;
 
-    public FoundryBrickBlock(Properties properties) {
+    public StoneBasinWallBlock(Properties properties) {
         super(properties);
 
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH)
@@ -72,7 +72,7 @@ public class FoundryBrickBlock extends HorizontalDirectionalBlock {
     }
 
     private static boolean isFoundryBrick(BlockState state) {
-        return state.getBlock() instanceof FoundryBrickBlock;
+        return state.getBlock() instanceof StoneBasinWallBlock;
     }
 
     @Override

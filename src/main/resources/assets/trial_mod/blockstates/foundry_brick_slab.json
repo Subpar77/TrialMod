@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "trial_mod:block/foundry_brick_slab"
+    },
+    "type=top": {
+      "model": "trial_mod:block/foundry_brick_slab_top"
+    },
+    "type=double": {
+      "model": "trial_mod:block/foundry_brick"
+    }
+  }
+}

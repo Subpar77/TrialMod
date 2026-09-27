@@ -1,6 +1,8 @@
 {
   "values": [
     "trial_mod:foundry_brick",
+    "trial_mod:foundry_brick_slab",
+    "trial_mod:stone_basin_wall",
     "trial_mod:foundry_tap",
     "trial_mod:copper_slag_block",
     "trial_mod:copper_slag_slab"
