@@ -1,7 +1,61 @@
 {
   "variants": {
-    "": {
+    "north=false,east=false,south=false,west=false": {
       "model": "trial_mod:block/foundry_channel"
+    },
+    "north=false,east=true,south=false,west=false": {
+      "model": "trial_mod:block/foundry_channel"
+    },
+    "north=false,east=false,south=false,west=true": {
+      "model": "trial_mod:block/foundry_channel"
+    },
+    "north=true,east=false,south=false,west=false": {
+      "model": "trial_mod:block/foundry_channel",
+      "y": 90
+    },
+    "north=false,east=false,south=true,west=false": {
+      "model": "trial_mod:block/foundry_channel",
+      "y": 90
+    },
+    "north=true,east=false,south=true,west=false": {
+      "model": "trial_mod:block/foundry_channel",
+      "y": 90
+    },
+    "north=false,east=true,south=false,west=true": {
+      "model": "trial_mod:block/foundry_channel"
+    },
+    "north=false,east=true,south=true,west=false": {
+      "model": "trial_mod:block/foundry_channel_corner",
+      "y": 90
+    },
+    "north=false,east=false,south=true,west=true": {
+      "model": "trial_mod:block/foundry_channel_corner",
+      "y": 180
+    },
+    "north=true,east=true,south=false,west=false": {
+      "model": "trial_mod:block/foundry_channel_corner"
+    },
+    "north=true,east=false,south=false,west=true": {
+      "model": "trial_mod:block/foundry_channel_corner",
+      "y": 270
+    },
+    "north=true,east=true,south=false,west=true": {
+      "model": "trial_mod:block/foundry_channel_t"
+    },
+    "north=false,east=true,south=true,west=true": {
+      "model": "trial_mod:block/foundry_channel_t",
+      "y": 180
+    },
+    "north=true,east=false,south=true,west=true": {
+      "model": "trial_mod:block/foundry_channel_t",
+      "y": 270
+    },
+    "north=true,east=true,south=true,west=false": {
+      "model": "trial_mod:block/foundry_channel_t",
+      "y": 90
+    },
+    "north=true,east=true,south=true,west=true": {
+      "model": "trial_mod:block/foundry_channel_4way"
     }
   }
 }
