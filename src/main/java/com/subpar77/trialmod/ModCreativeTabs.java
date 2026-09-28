@@ -20,6 +20,7 @@ public class ModCreativeTabs {
                     .icon(()-> new ItemStack(ModItems.STONE_BASIN_WALL.get())).displayItems((parameters, output) -> {
                     output.accept(ModItems.STONE_BASIN_WALL.get());
                     output.accept(ModItems.FOUNDRY_BRICK.get());
+                    output.accept(ModItems.FOUNDRY_CHANNEL_BLOCK_ITEM.get());
                     output.accept(ModItems.FOUNDRY_BRICK_SLAB_ITEM.get());
                     output.accept(ModItems.TAP_BLOCK_ITEM.get());
                     output.accept(ModItems.MOLTEN_COPPER_BUCKET.get());

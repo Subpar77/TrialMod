@@ -27,6 +27,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("copper_slag_slab",ModBlocks.COPPER_SLAG_SLAB, new Item.Properties());
     public static final DeferredItem<BlockItem> TAP_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("foundry_tap", ModBlocks.FOUNDRY_TAP, new Item.Properties());
+    public static final DeferredItem<BlockItem> FOUNDRY_CHANNEL_BLOCK_ITEM =
+            ITEMS.registerSimpleBlockItem("foundry_channel", ModBlocks.FOUNDRY_CHANNEL_BLOCK, new Item.Properties());
 
 
 

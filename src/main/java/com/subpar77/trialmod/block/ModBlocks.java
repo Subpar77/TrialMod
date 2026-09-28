@@ -27,6 +27,10 @@ public class ModBlocks {
             BLOCKS.registerBlock("foundry_brick_slab", SlabBlock::new, BlockBehaviour.Properties.of()
                             .strength(2.0F, 8.0F).sound(SoundType.STONE)
                     .requiresCorrectToolForDrops());
+    public static final DeferredBlock<FoundryChannelBlock> FOUNDRY_CHANNEL_BLOCK =
+            BLOCKS.registerBlock("foundry_channel", FoundryChannelBlock::new, BlockBehaviour.Properties.of().strength(2.0F,
+                            8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()
+                    .noOcclusion());
 
     public static final DeferredBlock<FoundryCopperSlagBlock> COPPER_SLAG_BLOCK =
             BLOCKS.registerBlock("copper_slag_block", FoundryCopperSlagBlock::new,
