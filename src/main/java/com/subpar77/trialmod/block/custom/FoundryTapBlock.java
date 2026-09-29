@@ -30,8 +30,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.Set;
 
-public class FoundryTapBlock extends Block implements EntityBlock {
+public class FoundryTapBlock extends Block implements EntityBlock, FoundryTransportConnectable {
     public FoundryTapBlock(Properties properties) {
         super(properties);
 
@@ -124,7 +125,7 @@ public class FoundryTapBlock extends Block implements EntityBlock {
 
         if(!(level instanceof ServerLevel serverLevel)) {
             return InteractionResult.SUCCESS;
-    }
+        }
 
         Direction outputDirection = state.getValue(FACING);
         Direction basinDirection = outputDirection.getOpposite();
@@ -171,4 +172,9 @@ public class FoundryTapBlock extends Block implements EntityBlock {
         return createTickerHelper(type, ModBlockEntities.FOUNDRY_TAP_BLOCK_ENTITY.get(), FoundryTapBlockEntity::serverTick);
     }
 
+    @Override
+    public boolean canTransportConnect(BlockState state, Direction direction) {
+
+        return direction == state.getValue(FACING);
+    }
 }

@@ -2,9 +2,11 @@ package com.subpar77.trialmod.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.foundry.FoundryChannelNetwork;
 import com.subpar77.trialmod.foundry.FoundryTransportConnectable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,9 +19,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.util.PrettyPrinter;
 
-import java.util.Locale;
+import java.util.Set;
 
 public class FoundryChannelBlock extends Block implements FoundryTransportConnectable {
     public static final MapCodec<FoundryChannelBlock> CODEC = simpleCodec(FoundryChannelBlock::new);
@@ -83,6 +84,21 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
         }
 
         return isOpen;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+
+        if(level instanceof ServerLevel level1) {
+            Set<BlockPos> possiblePos = FoundryChannelNetwork.findConnectedChannels(level1, pos);
+
+            TrialMod.LOGGER.info(
+                    "[Foundry] Channel Block at: {} found {} connected channels. Positions: {}",
+                    pos, possiblePos.size(), possiblePos
+            );
+        }
+
+        return InteractionResult.SUCCESS;
     }
 
     @Override
