@@ -3,6 +3,8 @@ package com.subpar77.trialmod.block.custom;
 import com.mojang.serialization.MapCodec;
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.FoundryChannelNetwork;
+import com.subpar77.trialmod.foundry.FoundryChannelNetworkResult;
+import com.subpar77.trialmod.foundry.FoundryFluidDestination;
 import com.subpar77.trialmod.foundry.FoundryTransportConnectable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,6 +15,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,6 +23,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 
 public class FoundryChannelBlock extends Block implements FoundryTransportConnectable {
@@ -90,11 +94,13 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 
         if(level instanceof ServerLevel level1) {
-            Set<BlockPos> possiblePos = FoundryChannelNetwork.findConnectedChannels(level1, pos);
+            FoundryChannelNetworkResult result = FoundryChannelNetwork.findConnectedChannels(level1, pos);
 
+            Set<BlockPos> possiblePos = result.channels();
+            List<FoundryFluidDestination> destinations = result.destinations();
             TrialMod.LOGGER.info(
-                    "[Foundry] Channel Block at: {} found {} connected channels. Positions: {}",
-                    pos, possiblePos.size(), possiblePos
+                    "[Foundry] Channel Block at: {} found {} connected channels and {} fluid destinations.",
+                    pos, possiblePos.size(), destinations.size()
             );
         }
 

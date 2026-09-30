@@ -30,6 +30,7 @@ public class TrialMod {
     public TrialMod(IEventBus modEventBus) {
 
         modEventBus.addListener(this::addCreative);
+        modEventBus.addListener(ModCapabilities::registerCapabilities);
 
         // Register the Deferred Register to the mod event bus so items get registered
         ModBlocks.register(modEventBus);

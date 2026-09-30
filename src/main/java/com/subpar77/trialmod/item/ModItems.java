@@ -29,6 +29,8 @@ public class ModItems {
             ITEMS.registerSimpleBlockItem("foundry_tap", ModBlocks.FOUNDRY_TAP, new Item.Properties());
     public static final DeferredItem<BlockItem> FOUNDRY_CHANNEL_BLOCK_ITEM =
             ITEMS.registerSimpleBlockItem("foundry_channel", ModBlocks.FOUNDRY_CHANNEL_BLOCK, new Item.Properties());
+    public static final DeferredItem<BlockItem> TEST_TANK_ITEM =
+            ITEMS.registerSimpleBlockItem("test_tank", ModBlocks.TEST_TANK_BLOCK, new Item.Properties());
 
 
 

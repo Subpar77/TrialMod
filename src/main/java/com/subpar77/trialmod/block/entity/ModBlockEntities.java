@@ -15,8 +15,9 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, TrialMod.MODID);
 
     public static final Supplier<BlockEntityType<FoundryTapBlockEntity>> FOUNDRY_TAP_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
-            "foundry_tap_block_entity", () -> BlockEntityType.Builder.of(FoundryTapBlockEntity::new, ModBlocks.FOUNDRY_TAP.get()).build(null)
-    );
+            "foundry_tap_block_entity", () -> BlockEntityType.Builder.of(FoundryTapBlockEntity::new, ModBlocks.FOUNDRY_TAP.get()).build(null));
+    public static final Supplier<BlockEntityType<FoundryTestTankBlockEntity>> TEST_TANK_ENTITY = BLOCK_ENTITY_TYPES.register(
+            "test_tank_entity", () -> BlockEntityType.Builder.of(FoundryTestTankBlockEntity::new, ModBlocks.TEST_TANK_BLOCK.get()).build(null));
 
 
     public static void register(IEventBus modEventBus) {
