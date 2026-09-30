@@ -7,6 +7,8 @@ import com.subpar77.trialmod.foundry.*;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -28,6 +30,7 @@ public class FoundryTapBlockEntity extends BlockEntity {
     private float previousGateProgress = 0.0F;
     private static final int TRANSFER_INTERVAL_TICKS = 20;
     private int transferCooldown =0;
+    private int nextDestinationIndex = 0;
 
     public static void clientTick(Level level, BlockPos pos, BlockState state, FoundryTapBlockEntity blockEntity) {
         blockEntity.previousGateProgress = blockEntity.gateProgress;
@@ -58,11 +61,11 @@ public class FoundryTapBlockEntity extends BlockEntity {
         }
 
         blockEntity.transferCooldown = 0;
-        attemptTransfer(serverLevel, pos, state);
+        blockEntity.attemptTransfer(serverLevel, pos, state);
 
     }
 
-    private static boolean attemptTransfer(ServerLevel level, BlockPos pos, BlockState state) {
+    private boolean attemptTransfer(ServerLevel level, BlockPos pos, BlockState state) {
         Direction outputDirection = state.getValue(FoundryTapBlock.FACING);
         BlockPos outputPos = pos.relative(outputDirection);
         BlockState firstChannelState = level.getBlockState(outputPos);
@@ -99,8 +102,14 @@ public class FoundryTapBlockEntity extends BlockEntity {
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
         FoundryFluidDestination selectedDestination = null;
         IFluidHandler selectedHandler = null;
+        int selectedIndex = -1;
+        int destinationCount = results.destinations().size();
+        int startIndex = Math.floorMod(nextDestinationIndex, destinationCount);
 
-        for(FoundryFluidDestination destination : results.destinations()) {
+        for(int offset = 0; offset < destinationCount; offset++) {
+            int index = (startIndex + offset) % destinationCount;
+            FoundryFluidDestination destination = results.destinations().get(index);
+
             IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, destination.receiverPos(),
                     destination.receiverSide());
 
@@ -113,6 +122,7 @@ public class FoundryTapBlockEntity extends BlockEntity {
             if (accepted >= FoundryBasin.MB_PER_BUCKET) {
                 selectedDestination = destination;
                 selectedHandler = handler;
+                selectedIndex = index;
                 break;
             }
         }
@@ -150,6 +160,9 @@ public class FoundryTapBlockEntity extends BlockEntity {
             return false;
         }
 
+        nextDestinationIndex = (selectedIndex + 1) % destinationCount;
+        setChanged();
+
         TrialMod.LOGGER.info(
                 "[Foundry] Tap {} transferred {} mB {} to receiver {} via route {}. Basin remaining={} mB.",
                 pos, actuallyAccepted, material.getSerializedName(), selectedDestination.receiverPos(),
@@ -162,5 +175,21 @@ public class FoundryTapBlockEntity extends BlockEntity {
 
     public float getGateProgress(float partialTick) {
         return Mth.lerp(partialTick, previousGateProgress, gateProgress);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putInt("NextDestinationIndex", nextDestinationIndex);
+
+
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        nextDestinationIndex = tag.getInt("NextDestinationIndex");
+
+
     }
 }
