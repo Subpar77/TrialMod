@@ -21,6 +21,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -90,6 +92,23 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
         return isOpen;
     }
 
+    private static boolean connectsToNeighbor(LevelAccessor level, BlockPos neighborPos, BlockState neighborState,
+                                              Direction direction) {
+
+        if (neighborState.getBlock() instanceof FoundryTransportConnectable connectable) {
+            return connectable.canTransportConnect(neighborState, direction.getOpposite());
+        }
+
+        if(level instanceof Level actuallevel)  {
+            IFluidHandler handler = actuallevel.getCapability(Capabilities.FluidHandler.BLOCK,
+                    neighborPos, direction.getOpposite());
+
+            return handler != null;
+        }
+
+        return false;
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 
@@ -118,11 +137,7 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
 
             BlockPos neighborPos = context.getClickedPos().relative(direction);
             BlockState neighborState = context.getLevel().getBlockState(neighborPos);
-            boolean connected = false;
-
-            if (neighborState.getBlock() instanceof FoundryTransportConnectable connectable) {
-                connected = connectable.canTransportConnect(neighborState, direction.getOpposite());
-            }
+            boolean connected = connectsToNeighbor(context.getLevel(), neighborPos, neighborState, direction);
 
             channelState = channelState.setValue(getConnectionProperty(direction), connected);
         }
@@ -147,11 +162,7 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
             return state;
         }
 
-        boolean connected = false;
-
-        if(neighborState.getBlock() instanceof FoundryTransportConnectable connectable) {
-            connected = connectable.canTransportConnect(neighborState, direction.getOpposite());
-        }
+        boolean connected = connectsToNeighbor(level, neighborPos, neighborState, direction);
 
         channelState = state.setValue(getConnectionProperty(direction), connected);
 
