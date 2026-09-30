@@ -1,10 +1,9 @@
 package com.subpar77.trialmod.block.entity;
 
 import com.subpar77.trialmod.TrialMod;
+import com.subpar77.trialmod.block.custom.FoundryChannelBlock;
 import com.subpar77.trialmod.block.custom.FoundryTapBlock;
-import com.subpar77.trialmod.foundry.BasinDetails;
-import com.subpar77.trialmod.foundry.FoundryBasin;
-import com.subpar77.trialmod.foundry.FoundryBasinSavedData;
+import com.subpar77.trialmod.foundry.*;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +13,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.Optional;
 
@@ -63,10 +65,20 @@ public class FoundryTapBlockEntity extends BlockEntity {
     private static boolean attemptTransfer(ServerLevel level, BlockPos pos, BlockState state) {
         Direction outputDirection = state.getValue(FoundryTapBlock.FACING);
         BlockPos outputPos = pos.relative(outputDirection);
+        BlockState firstChannelState = level.getBlockState(outputPos);
 
-        if(!level.getBlockState(outputPos).isAir()) {
+        if(!(firstChannelState.getBlock() instanceof FoundryChannelBlock)) {
             return false;
         }
+
+        FoundryChannelNetworkResult results = FoundryChannelNetwork.findConnectedChannels(level, outputPos);
+
+        if(results.destinations().isEmpty()) {
+            return false;
+        }
+
+        TrialMod.LOGGER.info("[Foundry] Tap found {} fluid destinations.", results.destinations().size());
+
 
         Direction basinDirection = outputDirection.getOpposite();
         BlockPos wallPos = pos.relative(basinDirection);
@@ -83,8 +95,36 @@ public class FoundryTapBlockEntity extends BlockEntity {
         }
 
         FoundryMaterial material = details.material().get();
-        BlockState fluidBlock = material.getMoltenFluid().defaultFluidState().createLegacyBlock();
+        FluidStack transferStack = new FluidStack(material.getMoltenFluid(),FoundryBasin.MB_PER_BUCKET);
         FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
+        FoundryFluidDestination selectedDestination = null;
+        IFluidHandler selectedHandler = null;
+
+        for(FoundryFluidDestination destination : results.destinations()) {
+            IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, destination.receiverPos(),
+                    destination.receiverSide());
+
+            if (handler == null) {
+                continue;
+            }
+
+            int accepted = handler.fill(transferStack, IFluidHandler.FluidAction.SIMULATE);
+
+            if (accepted >= FoundryBasin.MB_PER_BUCKET) {
+                selectedDestination = destination;
+                selectedHandler = handler;
+                break;
+            }
+        }
+
+            if(selectedDestination == null || selectedHandler == null) {
+                return false;
+            }
+
+            TrialMod.LOGGER.info(
+                    "[Foundry] Tap selected receiver {} via route {}.",
+                    selectedDestination.receiverPos(), selectedDestination.route()
+            );
 
         boolean removed = savedData.tryRemoveMoltenMaterial(details.basinKey(), FoundryBasin.MB_PER_BUCKET);
 
@@ -92,26 +132,30 @@ public class FoundryTapBlockEntity extends BlockEntity {
             return false;
         }
 
-        boolean placed = level.setBlock(outputPos, fluidBlock, Block.UPDATE_ALL);
+        int actuallyAccepted = selectedHandler.fill(transferStack, IFluidHandler.FluidAction.EXECUTE);
+        int amountToRestore = FoundryBasin.MB_PER_BUCKET - actuallyAccepted;
 
-        if(!placed) {
-            boolean restored = savedData.tryAddMoltenMaterial(details.basinKey(), material, FoundryBasin.MB_PER_BUCKET,
+        if(amountToRestore > 0) {
+            boolean restored = savedData.tryAddMoltenMaterial(details.basinKey(), material, amountToRestore,
                     details.capacityMb());
 
             if(!restored) {
                 TrialMod.LOGGER.warn(
-                        "[Foundry] Failed to restore {} mB {} to basin {} after Tap output failed.",
-                        FoundryBasin.MB_PER_BUCKET, material.getSerializedName(), details.basinKey()
-                );
+                "[Foundry] Failed to restore {} mB {} to basin {} after partial transfer.",
+                        amountToRestore, material.getSerializedName(), details.basinKey());
             }
+        }
+
+        if(actuallyAccepted <= 0) {
             return false;
         }
 
         TrialMod.LOGGER.info(
-                "[Foundry] Tap {} transferred {} mB {} from basin {}. Remaining molten={} mB.",
-                pos, FoundryBasin.MB_PER_BUCKET, material.getSerializedName(), details.basinKey(), savedData.getMoltenAmountMb(
-                        details.basinKey())
-                );
+                "[Foundry] Tap {} transferred {} mB {} to receiver {} via route {}. Basin remaining={} mB.",
+                pos, actuallyAccepted, material.getSerializedName(), selectedDestination.receiverPos(),
+                selectedDestination.route(), savedData.getMoltenAmountMb(details.basinKey())
+        );
+
         return true;
 
     }

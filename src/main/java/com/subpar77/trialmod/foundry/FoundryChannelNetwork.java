@@ -64,10 +64,10 @@ public class FoundryChannelNetwork {
                             direction.getOpposite());
 
                     if(fluidHandler != null) {
-                        TrialMod.LOGGER.info(
-                                "[Foundry] Found fluid receiver at {} on side {}",
-                                neighborPos, direction.getOpposite()
-                        );
+//                        TrialMod.LOGGER.info(
+//                                "[Foundry] Found fluid receiver at {} on side {}",
+//                                neighborPos, direction.getOpposite()
+//                        );
 
                         List<BlockPos> route = reconstructPath(cameFrom, startPos, currentPos);
 
@@ -76,14 +76,14 @@ public class FoundryChannelNetwork {
 
                         destinations.add(destination);
 
-                        TrialMod.LOGGER.info("[Foundry] Destinations: {}.", destinations);
+//                        TrialMod.LOGGER.info("[Foundry] Destinations: {}.", destinations);
 
                         FluidStack testFluid = new FluidStack(ModFluids.MOLTEN_COPPER_SOURCE.get(), 1000);
                         int accepted = fluidHandler.fill(testFluid, IFluidHandler.FluidAction.SIMULATE);
 
-                        TrialMod.LOGGER.info(
-                                "[Foundry] Receiver at {} would accept {} mB.", neighborPos, accepted
-                        );
+//                        TrialMod.LOGGER.info(
+//                                "[Foundry] Receiver at {} would accept {} mB.", neighborPos, accepted
+//                        );
                     }
                 }
             }
