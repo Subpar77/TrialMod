@@ -80,9 +80,6 @@ public class FoundryTapBlockEntity extends BlockEntity {
             return false;
         }
 
-        TrialMod.LOGGER.info("[Foundry] Tap found {} fluid destinations.", results.destinations().size());
-
-
         Direction basinDirection = outputDirection.getOpposite();
         BlockPos wallPos = pos.relative(basinDirection);
         Optional<BasinDetails> result = FoundryBasin.inspectBasin(level, wallPos);
@@ -130,11 +127,6 @@ public class FoundryTapBlockEntity extends BlockEntity {
             if(selectedDestination == null || selectedHandler == null) {
                 return false;
             }
-
-            TrialMod.LOGGER.info(
-                    "[Foundry] Tap selected receiver {} via route {}.",
-                    selectedDestination.receiverPos(), selectedDestination.route()
-            );
 
         boolean removed = savedData.tryRemoveMoltenMaterial(details.basinKey(), FoundryBasin.MB_PER_BUCKET);
 
