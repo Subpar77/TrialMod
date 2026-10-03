@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.Optional;
 import java.util.Set;
@@ -210,6 +211,38 @@ public class FoundryBasinFinalization {
         }
 
         return Optional.empty();
+    }
+
+    public static boolean dropInputItems(ServerLevel level, BlockPos basinKey, Set<BlockPos> rememberedInterior) {
+        FoundryBasinSavedData savedData = FoundryBasinSavedData.get(level);
+        ItemStackHandler inventory = savedData.getInputInventory(basinKey);
+
+        if(inventory == null) {
+            return true;
+        }
+
+        ItemStack stack = inventory.getStackInSlot(0);
+
+        if(stack.isEmpty()) {
+            return true;
+        }
+
+        BlockPos dropPos = findDropPosition(level, basinKey, rememberedInterior);
+
+        if(!level.hasChunkAt(dropPos) || !level.getBlockState(dropPos).isAir()) {
+            return false;
+        }
+
+        ItemEntity dropped = new ItemEntity(level, dropPos.getX() +0.5, dropPos.getY() + 0.5, dropPos.getZ() + 0.5,
+                stack.copy());
+        dropped.setDefaultPickUpDelay();
+
+        if(!level.addFreshEntity(dropped)) {
+            return false;
+        }
+
+        inventory.setStackInSlot(0, ItemStack.EMPTY);
+        return true;
     }
 
 }

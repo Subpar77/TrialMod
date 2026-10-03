@@ -51,12 +51,16 @@ public final class FoundryEvents {
                     FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
 
                     if(savedData.getAmountMb(basinKey) == 0) {
-                        TrialMod.LOGGER.info(
-                                "[Foundry] Deregistering empty breached basin {}.",
-                                basinKey
-                        );
 
-                        savedData.removeBasin(basinKey);
+                        if(FoundryBasinFinalization.dropInputItems(level, basinKey, rememberedInterior)) {
+                            savedData.removeBasin(basinKey);
+
+                            TrialMod.LOGGER.info(
+                                    "[Foundry] Deregistering empty breached basin {}.",
+                                    basinKey
+                            );
+                        }
+
                         continue;
                     }
 
@@ -67,12 +71,14 @@ public final class FoundryEvents {
                             if(finalized) {
                                 FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
 
-                                TrialMod.LOGGER.info(
-                                        "[Foundry] Deregistering finalized basin {}.",
-                                        basinKey
-                                );
+                                if(FoundryBasinFinalization.dropInputItems(level, basinKey, rememberedInterior)) {
+                                    savedData.removeBasin(basinKey);
 
-                                savedData.removeBasin(basinKey);
+                                    TrialMod.LOGGER.info(
+                                            "[Foundry] Deregistering finalized basin {}.",
+                                            basinKey
+                                    );
+                                }
                                 continue;
                             }
                     }
@@ -111,7 +117,10 @@ public final class FoundryEvents {
 
                         FoundryBasinVisuals.update(level, basinKey, rememberedInterior);
 
-                        savedData.removeBasin(basinKey);
+                        if(FoundryBasinFinalization.dropInputItems(level, basinKey, rememberedInterior)) {
+                            savedData.removeBasin(basinKey);
+                        }
+
                         continue;
                     }
 

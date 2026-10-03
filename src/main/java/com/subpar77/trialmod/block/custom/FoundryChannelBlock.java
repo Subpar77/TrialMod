@@ -2,13 +2,11 @@ package com.subpar77.trialmod.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import com.subpar77.trialmod.TrialMod;
-import com.subpar77.trialmod.foundry.FoundryChannelNetwork;
-import com.subpar77.trialmod.foundry.FoundryChannelNetworkResult;
-import com.subpar77.trialmod.foundry.FoundryFluidDestination;
-import com.subpar77.trialmod.foundry.FoundryTransportConnectable;
+import com.subpar77.trialmod.foundry.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -20,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -41,7 +40,8 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
         super(properties);
 
         this.registerDefaultState(this.getStateDefinition().any().setValue(NORTH, false)
-                .setValue(EAST, false).setValue(SOUTH,false).setValue(WEST, false));
+                .setValue(EAST, false).setValue(SOUTH,false).setValue(WEST, false)
+                .setValue(VISUAL, FoundryChannelVisual.NONE));
     }
 
     private static BooleanProperty getConnectionProperty(Direction direction) {
@@ -109,6 +109,9 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
         return false;
     }
 
+    public static final EnumProperty<FoundryChannelVisual> VISUAL = EnumProperty.create("visual",
+            FoundryChannelVisual.class);
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 
@@ -147,7 +150,7 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(NORTH, EAST, SOUTH, WEST);
+        builder.add(NORTH, EAST, SOUTH, WEST, VISUAL);
     }
 
 
@@ -182,5 +185,19 @@ public class FoundryChannelBlock extends Block implements FoundryTransportConnec
         }
 
         return true;
+    }
+
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        FoundryChannelVisuals.onScheduledTick(level, pos);
+    }
+
+    @Override
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if(level instanceof  ServerLevel serverLevel && !state.is(newState.getBlock())) {
+            FoundryChannelVisuals.forget(serverLevel, pos);
+        }
+
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 }

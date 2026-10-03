@@ -9,6 +9,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -33,6 +34,7 @@ public class FoundryBasinSavedData extends SavedData {
         }
 
         state = new FoundryBasinState(70.0F);
+        state.setInputChangeListener(this::setDirty);
         state.setInterior(interior);
 
         basins.put(key, state);
@@ -50,6 +52,12 @@ public class FoundryBasinSavedData extends SavedData {
         FoundryBasinState state = basins.get(basinKey.asLong());
 
         return state != null ? state.getBrokenTicks() : 0;
+    }
+
+    public @Nullable ItemStackHandler getInputInventory(BlockPos basinKey) {
+        FoundryBasinState state = basins.get(basinKey.asLong());
+
+        return state != null ? state.getInputInventory() : null;
     }
 
     public void setBrokenTicks(BlockPos basinKey, int brokenTicks) {
@@ -108,6 +116,20 @@ public class FoundryBasinSavedData extends SavedData {
     }
 
     public void removeBasin(BlockPos basinKey) {
+
+        FoundryBasinState state = basins.get(basinKey.asLong());
+        if(state == null) {
+            return;
+        }
+
+        if(!state.getInputInventory().getStackInSlot(0).isEmpty()) {
+            TrialMod.LOGGER.warn(
+                    "[Foundry] Cannot remove basin {} while its input inventory contains items.",
+                    basinKey
+            );
+            return;
+        }
+
         if (basins.remove(basinKey.asLong()) != null) {
             setDirty();
             TrialMod.LOGGER.info("Removed basin key: {}",
@@ -363,6 +385,12 @@ public class FoundryBasinSavedData extends SavedData {
 
             FoundryBasinState state = new FoundryBasinState(temperature, material, amountMb, moltenAmountMb, interior,
                     brokenTicks);
+            state.setInputChangeListener(data::setDirty);
+
+            if(basinTag.contains("InputInventory", Tag.TAG_COMPOUND)) {
+                state.getInputInventory().deserializeNBT(registries, basinTag.getCompound("InputInventory"));
+            }
+
             state.setLastSpillPos(lastSpillPos);
 
             //Temp Debug
@@ -423,6 +451,7 @@ public class FoundryBasinSavedData extends SavedData {
             basinTag.putInt("MoltenAmountMb", state.getMoltenAmountMb());
             basinTag.putLongArray("Interior", interiorPositions);
             basinTag.putInt("BrokenTicks", state.getBrokenTicks());
+            basinTag.put("InputInventory", state.getInputInventory().serializeNBT(registries));
 
             if (state.getMaterial() != null) {
                 basinTag.putString("Material", state.getMaterial().getSerializedName());

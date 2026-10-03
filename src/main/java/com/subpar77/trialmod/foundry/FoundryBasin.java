@@ -40,7 +40,7 @@ public class FoundryBasin {
             return Optional.empty();
         }
 
-        int capacityMb = getCapacityMb(interior);
+        int capacityMb = getStateCapacityMb(level, interior);
 
         return Optional.of(new BasinDetails(basinKey, capacityMb, savedData.getAmountMb(basinKey),
                 savedData.getMoltenAmountMb(basinKey), savedData.getTemperature(basinKey),

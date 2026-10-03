@@ -1,0 +1,41 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "fluid": "trial_mod:block/molten_copper_flow",
+    "particle": "trial_mod:block/molten_copper_flow"
+  },
+  "elements": [
+    {
+      "name": "channel_fluid",
+      "from": [0, 11.2, 6.1],
+      "to": [16, 13.2, 9.9],
+      "shade": false,
+      "faces": {
+        "north": {
+          "uv": [0, 1, 16, 3],
+          "texture": "#fluid"
+        },
+        "east": {
+          "uv": [0.2, 1, 4, 3],
+          "texture": "#fluid"
+        },
+        "south": {
+          "uv": [0, 1, 16, 3],
+          "texture": "#fluid"
+        },
+        "west": {
+          "uv": [0, 1, 3.8, 3],
+          "texture": "#fluid"
+        },
+        "up": {
+          "uv": [0, 0, 16, 3.8],
+          "texture": "#fluid"
+        },
+        "down": {
+          "uv": [0, 0.2, 16, 4],
+          "texture": "#fluid"
+        }
+      }
+    }
+  ]
+}

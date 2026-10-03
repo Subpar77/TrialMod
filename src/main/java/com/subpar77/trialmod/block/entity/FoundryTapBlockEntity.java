@@ -152,6 +152,8 @@ public class FoundryTapBlockEntity extends BlockEntity {
             return false;
         }
 
+        FoundryChannelVisuals.showFlow(level, results.channels(), material);
+
         nextDestinationIndex = (selectedIndex + 1) % destinationCount;
         setChanged();
 

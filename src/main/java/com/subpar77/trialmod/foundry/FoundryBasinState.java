@@ -2,6 +2,7 @@ package com.subpar77.trialmod.foundry;
 
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -20,6 +21,12 @@ public class FoundryBasinState {
     private int amountMb;
     private int moltenAmountMb;
     private int brokenTicks;
+    private final ItemStackHandler inputInventory = new ItemStackHandler(1) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            inputChangeListener.run();
+        }
+    };
 
     private final Set<BlockPos> interior = new HashSet<>();
 
@@ -66,6 +73,13 @@ public class FoundryBasinState {
              this.interior.add(pos.immutable());
          }
     }
+
+    private Runnable inputChangeListener = () -> {};
+
+
+    public ItemStackHandler getInputInventory() {return inputInventory;}
+
+    public void setInputChangeListener(Runnable listener) {inputChangeListener = listener;}
 
     public int getBrokenTicks() {
         return brokenTicks;
