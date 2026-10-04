@@ -80,7 +80,8 @@ Exact mB costs remain part of the material-accounting design below.
 - [ ] Define exact fluid costs and output counts consistent with the melting system.
 - [ ] Implement one shared casting operation for players, villagers, and machines.
 - [ ] Validate resources and output space before committing a cast; failed operations leave resources intact.
-- [ ] Add persistent real-ingredient storage and the enabled/disabled grid configuration.
+- [x] Add the enabled/disabled grid configuration and save/load support. Slot-state data verified unchanged after save/quit and reload.
+- [ ] Verify real-ingredient inventory persistence and occupied-slot protection. The nine-slot inventory and serialization are implemented; item insertion and behavior tests remain.
 - [ ] Add the manual menu and screen with a configurable 3x3 grid.
 - [ ] Find all compatible target recipes, including recipes using different virtual forms of the same molten metal.
 - [ ] Add a stonecutter-style result selector and automatically select an unambiguous recipe.
