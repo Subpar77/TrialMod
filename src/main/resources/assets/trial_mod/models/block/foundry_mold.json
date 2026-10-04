@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_anvil",
+  "textures": {
+    "particle": "trial_mod:block/foundry_mold",
+    "body": "trial_mod:block/foundry_mold",
+    "top": "trial_mod:block/foundry_mold_top"
+  }
+}

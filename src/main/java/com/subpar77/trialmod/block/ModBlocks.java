@@ -35,6 +35,10 @@ public class ModBlocks {
             BLOCKS.registerBlock("test_tank_block", FoundryTestTankBlock::new, BlockBehaviour.Properties.of().strength(2.0F,
                             8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()
                     .noOcclusion().noLootTable());
+    public static final DeferredBlock<FoundryMoldBlock> FOUNDRY_MOLD =
+            BLOCKS.registerBlock("foundry_mold", FoundryMoldBlock::new, BlockBehaviour.Properties.of().strength(2.0F,
+                            8.0F).sound(SoundType.STONE).requiresCorrectToolForDrops()
+                    .noOcclusion());
 
     public static final DeferredBlock<FoundryCopperSlagBlock> COPPER_SLAG_BLOCK =
             BLOCKS.registerBlock("copper_slag_block", FoundryCopperSlagBlock::new,

@@ -18,6 +18,8 @@ public class ModBlockEntities {
             "foundry_tap_block_entity", () -> BlockEntityType.Builder.of(FoundryTapBlockEntity::new, ModBlocks.FOUNDRY_TAP.get()).build(null));
     public static final Supplier<BlockEntityType<FoundryTestTankBlockEntity>> TEST_TANK_ENTITY = BLOCK_ENTITY_TYPES.register(
             "test_tank_entity", () -> BlockEntityType.Builder.of(FoundryTestTankBlockEntity::new, ModBlocks.TEST_TANK_BLOCK.get()).build(null));
+    public static final Supplier<BlockEntityType<FoundryMoldBlockEntity>> FOUNDRY_MOLD_ENTITY = BLOCK_ENTITY_TYPES.register(
+            "foundry_mold_entity", () -> BlockEntityType.Builder.of(FoundryMoldBlockEntity::new, ModBlocks.FOUNDRY_MOLD.get()).build(null));
 
 
     public static void register(IEventBus modEventBus) {

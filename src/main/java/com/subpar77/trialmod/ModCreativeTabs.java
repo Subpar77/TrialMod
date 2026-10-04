@@ -28,6 +28,7 @@ public class ModCreativeTabs {
                     output.accept(ModItems.COPPER_SLAG_SLAB_ITEM.get());
                     output.accept(ModItems.COPPER_SLAG_CLUMP.get());
                     output.accept(ModItems.COPPER_SLAG_NUGGET.get());
+                    output.accept(ModItems.FOUNDRY_MOLD_BLOCK_ITEM.get());
                     }).build());
 
     public static void register(IEventBus modEventBus) {
