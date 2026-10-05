@@ -14,6 +14,8 @@ public class ModCapabilities {
                 (blockEntity, side) -> blockEntity.getFluidHandler());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModBlockEntities.FOUNDRY_MOLD_ENTITY.get(),
                 (blockEntity, side) -> blockEntity.getFluidHandler());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.FOUNDRY_MOLD_ENTITY.get(),
+                (blockEntity, side) -> blockEntity.getItemHandler());
 
         event.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, state,
                                                              blockEntity, side) -> {

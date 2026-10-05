@@ -4,10 +4,12 @@ import com.subpar77.trialmod.foundry.material.FoundryMaterial;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class FoundryMoldBlockEntity extends BlockEntity {
@@ -63,6 +65,15 @@ public class FoundryMoldBlockEntity extends BlockEntity {
         protected void onContentsChanged(int slot) {
             FoundryMoldBlockEntity.this.setChanged();
         }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            if(isSlotDisabled(slot)) {
+                return false;
+            }
+
+            return true;
+        }
     };
 
     private final FluidTank reservoir = new FluidTank(4000, stack ->
@@ -100,4 +111,6 @@ public class FoundryMoldBlockEntity extends BlockEntity {
     }
 
     public IFluidHandler getFluidHandler() {return reservoir;}
+
+    public IItemHandler getItemHandler() {return inputInventory;}
 }

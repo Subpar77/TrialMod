@@ -81,7 +81,10 @@ Exact mB costs remain part of the material-accounting design below.
 - [ ] Implement one shared casting operation for players, villagers, and machines.
 - [ ] Validate resources and output space before committing a cast; failed operations leave resources intact.
 - [x] Add the enabled/disabled grid configuration and save/load support. Slot-state data verified unchanged after save/quit and reload.
-- [ ] Verify real-ingredient inventory persistence and occupied-slot protection. The nine-slot inventory and serialization are implemented; item insertion and behavior tests remain.
+- [x] Reject real-item insertion into disabled slots. Hopper input verified: items remain in the hopper when all slots are disabled and enter the enabled slot when one is available.
+- [x] Verify real-ingredient inventory persistence and occupied-slot protection during loading. Ingredient count, slot position, and grid configuration survive save/reload; loading leaves occupied slots enabled.
+- [ ] Verify that `setSlotDisabled()` rejects disabling an occupied slot through a player interaction once the menu is available.
+- [x] Drop real ingredients when the mold is mined. Survival mining returns the mold item and exact ingredient count; the replaced mold has an empty ingredient inventory.
 - [ ] Add the manual menu and screen with a configurable 3x3 grid.
 - [ ] Find all compatible target recipes, including recipes using different virtual forms of the same molten metal.
 - [ ] Add a stonecutter-style result selector and automatically select an unambiguous recipe.
@@ -92,7 +95,7 @@ Exact mB costs remain part of the material-accounting design below.
 - [ ] Play the hammer/anvil sound only after a successful cast.
 - [ ] Save and restore all owned material, real ingredients, grid configuration, selected recipe, and any finished output through world save/load.
 - [ ] Add bucket extraction through the UI tank display for fluid recovery before endpoint pickup.
-- [ ] Preserve real ingredients and finished items when the mold is removed, and preserve resources during interrupted casts except for the agreed endpoint-fluid pickup discard.
+- [ ] Preserve real ingredients and finished items when the mold is removed, and preserve resources during interrupted casts except for the agreed endpoint-fluid pickup discard. Real-ingredient drops are implemented and verified for survival mining; finished output and interrupted casting remain to implement and test.
 - [ ] Verify multiplayer interactions cannot duplicate output or spend the same resources twice.
 - [ ] Add molten iron support and verify the iron-sword example when that material is available.
 - [ ] Verify the full-grid iron-ingot/iron-block ambiguity, selection changes, exact consumption, and behavior when only the cheaper result is affordable.
@@ -118,10 +121,12 @@ Fluid supply, real-ingredient insertion, finished-item extraction, and triggerin
 a cast are separate responsibilities. Automation must never extract a ghost
 ingredient or an output preview as though it were a stored item.
 
-- [ ] Expose the real ingredient inventory and finished-item output through the NeoForge item-handler capability.
+- [x] Expose the real ingredient inventory through the NeoForge item-handler capability. The current handler is available on all faces; hopper insertion verified.
+- [ ] Expose finished-item output through the NeoForge item-handler capability.
 - [ ] Define which faces allow fluid input, ingredient insertion, and output extraction.
 - [ ] Define how automated equipment selects the recipe and triggers casting.
-- [ ] Test ordinary hopper/item-pipe input and output.
+- [x] Test ordinary hopper ingredient input, including disabled-slot rejection.
+- [ ] Test item-pipe ingredient input and automated extraction behavior for ingredients and finished output.
 - [ ] Investigate and test Create deployer operation through a block interaction.
 - [ ] Investigate and test Create mechanical-arm access, including any required integration.
 - [ ] Define and investigate the desired Create mechanical-press interaction.
