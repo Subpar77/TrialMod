@@ -28,27 +28,29 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
         this.access = ContainerLevelAccess.create(mold.getLevel(), mold.getBlockPos());
 
 
-        for(int row = 0; row < 3; row++) {
-            for(int column = 0; column < 3; column++) {
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 3; column++) {
                 addSlot(new SlotItemHandler(mold.getItemHandler(), row * 3 + column,
                         29 + column * 18, 16 + row * 18));
             }
         }
 
-        for(int row = 0; row < 3; row++) {
-            for(int column = 0; column < 9; column++) {
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 9; column++) {
                 addSlot(new Slot(playerInventory, 9 + row * 9 + column, 8 + column * 18, 84 + row * 18));
             }
         }
 
-        for(int column = 0; column < 9; column++) {
+        for (int column = 0; column < 9; column++) {
             addSlot(new Slot(playerInventory, column, 8 + column * 18, 142));
         }
 
         addDataSlots(mold.getSlotData());
     }
 
-    public boolean isSlotDisabled(int slot) {return mold.isSlotDisabled(slot);}
+    public boolean isSlotDisabled(int slot) {
+        return mold.isSlotDisabled(slot);
+    }
 
     private static FoundryMoldBlockEntity findMold(Inventory playerInventory, BlockPos pos) {
         BlockEntity entity = playerInventory.player.level().getBlockEntity(pos);
@@ -65,13 +67,14 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
                 extraData.readBlockPos()));
     }
 
+
     @Override
     public boolean clickMenuButton(Player player, int id) {
-        if(id < 0 || id >= 9) {
+        if (id < 0 || id >= 9) {
             return false;
         }
 
-        if(player.level().isClientSide || player.isSpectator() || !getCarried().isEmpty()) {
+        if (player.level().isClientSide || player.isSpectator() || !getCarried().isEmpty()) {
             return false;
         }
 
@@ -80,7 +83,42 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY;
+        if (index < 0 || index > slots.size() - 1) {
+            return ItemStack.EMPTY;
+        }
+
+        Slot sourceSlot = slots.get(index);
+
+        if (!sourceSlot.hasItem()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack sourceStack = sourceSlot.getItem();
+        ItemStack originalStack = sourceStack.copy();
+
+        if (index < 9) {
+            if (!moveItemStackTo(sourceStack, 9, slots.size(), true)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            if (!moveItemStackTo(sourceStack, 0, 9, false)) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (sourceStack.isEmpty()) {
+            sourceSlot.setByPlayer(ItemStack.EMPTY);
+        } else {
+            sourceSlot.setChanged();
+        }
+
+        if (sourceStack.getCount() == originalStack.getCount()) {
+            return ItemStack.EMPTY;
+        }
+
+        sourceSlot.onTake(player, sourceStack);
+        mold.setChanged();
+        return originalStack;
     }
 
     @Override

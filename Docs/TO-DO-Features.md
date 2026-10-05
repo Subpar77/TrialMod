@@ -98,7 +98,7 @@ The existing `textures/container/mold.png` defines the intended layout:
 - [x] Register the mold menu and client screen, supply the menu from the block entity, and send the mold position when opening. Compilation and empty-hand right-click opening verified in game.
 - [ ] Verify regular-click ingredient insertion/extraction and contents after closing and reopening the manual menu.
 - [x] Add ordinary item tooltips to the manual screen. Compilation and hovering over items verified in game.
-- [ ] Add shift-click transfers between the mold's ingredient grid and player inventory.
+- [x] Add shift-click transfers between the mold's ingredient grid and player inventory. Transfers in both directions, rejection when all mold slots are disabled, and partial-transfer item counts after save/reload verified in game. Successful transfers explicitly mark the mold changed for persistence.
 - [x] Synchronize the nine enabled/disabled slot flags through menu `ContainerData` and draw vanilla crafter disabled-slot overlays. Command-configured patterns, manual insertion rejection/acceptance, and the display after closing and reopening verified in game.
 - [x] Add the manual menu and screen with a configurable 3x3 grid. Empty-slot clicks toggle both ways through a server-validated menu button request; occupied slots, a carried item, and player-inventory clicks retain ordinary inventory behavior. Compilation, in-game interactions, reopening, and save/reload verified.
 - [ ] Display the mold's synchronized fluid amount in the vertical bar left of the ingredient grid.
