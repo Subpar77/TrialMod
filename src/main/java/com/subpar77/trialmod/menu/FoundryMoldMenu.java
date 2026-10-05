@@ -3,15 +3,14 @@ package com.subpar77.trialmod.menu;
 import com.subpar77.trialmod.block.ModBlocks;
 import com.subpar77.trialmod.block.entity.FoundryMoldBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,11 +18,14 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
 
     private final FoundryMoldBlockEntity mold;
     private final ContainerLevelAccess access;
+    private final ContainerData fluidData;
 
-    public FoundryMoldMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory,
-                           FoundryMoldBlockEntity mold) {
+    private FoundryMoldMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory,
+                           FoundryMoldBlockEntity mold, ContainerData fluidData) {
         super(menuType, containerId);
 
+        checkContainerDataCount(fluidData, 3);
+        this.fluidData = fluidData;
         this.mold = mold;
         this.access = ContainerLevelAccess.create(mold.getLevel(), mold.getBlockPos());
 
@@ -46,11 +48,23 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
         }
 
         addDataSlots(mold.getSlotData());
+        addDataSlots(this.fluidData);
+    }
+
+    public FoundryMoldMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory,
+                           FoundryMoldBlockEntity mold) {
+        this(menuType, containerId, playerInventory, mold, mold.getFluidData());
     }
 
     public boolean isSlotDisabled(int slot) {
         return mold.isSlotDisabled(slot);
     }
+
+    public final int getFluidAmount() {return fluidData.get(0);}
+
+    public final int getFluidCapacity() {return fluidData.get(1);}
+
+    public Fluid getFluid() { return BuiltInRegistries.FLUID.byId(fluidData.get(2));}
 
     private static FoundryMoldBlockEntity findMold(Inventory playerInventory, BlockPos pos) {
         BlockEntity entity = playerInventory.player.level().getBlockEntity(pos);
@@ -64,7 +78,7 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
 
     public FoundryMoldMenu(int containerID, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
         this(ModMenus.FOUNDRY_MOLD_MENU.get(), containerID, playerInventory, findMold(playerInventory,
-                extraData.readBlockPos()));
+                extraData.readBlockPos()), new SimpleContainerData(3));
     }
 
 

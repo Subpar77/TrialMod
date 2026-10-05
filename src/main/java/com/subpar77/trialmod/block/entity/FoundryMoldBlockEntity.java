@@ -5,6 +5,7 @@ import com.subpar77.trialmod.menu.FoundryMoldMenu;
 import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -69,6 +70,44 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
 
     }
 
+    private final ContainerData fluidData = new ContainerData() {
+        @Override
+        public int get(int index) {
+            if(index < 0 || index > 2) {
+                return 0;
+            }
+
+            if(index == 0) {
+                return getFluidAmount();
+            }
+
+            if(index == 1) {
+                return getFluidCapacity();
+            }
+
+            if(index == 2) {
+                return getFluidId();
+            }
+
+            return 0;
+        }
+
+        @Override
+        public void set(int index, int value) {
+//      Server values are read directly from the reservoir.
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+    };
+
+    public final ContainerData getFluidData() {return fluidData;}
+
+    public int getFluidId() {return BuiltInRegistries.FLUID.getId(reservoir.getFluid().getFluid());
+    }
+
     private final ContainerData slotData = new ContainerData() {
         @Override
         public int get(int index) {
@@ -106,6 +145,10 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
             return true;
         }
     };
+
+    public final int getFluidAmount() {return reservoir.getFluidAmount();}
+
+    public final int getFluidCapacity() {return reservoir.getCapacity();}
 
     private final FluidTank reservoir = new FluidTank(4000, stack ->
             FoundryMaterial.fromFluid(stack.getFluid()).isPresent()) {
