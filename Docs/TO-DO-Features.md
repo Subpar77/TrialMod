@@ -59,6 +59,16 @@ Example with all nine slots enabled and no real items in the grid:
 
 Exact mB costs remain part of the material-accounting design below.
 
+### Agreed manual screen layout
+
+The existing `textures/container/mold.png` defines the intended layout:
+
+- The vertical bar left of the 3x3 ingredient grid displays the amount of fluid currently stored in the mold.
+- The brown horizontal area displays selectable matching recipes when more than one recipe is compatible with the ingredients and grid configuration. This texture section was taken directly from the vanilla stonecutter UI; use `StonecutterScreen` and `StonecutterMenu` as the behavior blueprint for result previews, selected/hovered states, scrolling, and server-side selection. Adapt coordinates and the visible recipe count to the mold's layout.
+- The small gray area beside the recipe selector is its scrollbar when the matching recipes exceed the visible space.
+- The larger square above the recipe selector is the casting output slot, where the selected result is previewed and taken under the agreed casting rules.
+- The lower three inventory rows and hotbar display the player's inventory.
+
 ### Agreed endpoint pickup and fluid recovery
 
 - Deliberately picking up a mold discards the molten fluid stored inside it; the dropped mold item does not carry that fluid.
@@ -83,9 +93,15 @@ Exact mB costs remain part of the material-accounting design below.
 - [x] Add the enabled/disabled grid configuration and save/load support. Slot-state data verified unchanged after save/quit and reload.
 - [x] Reject real-item insertion into disabled slots. Hopper input verified: items remain in the hopper when all slots are disabled and enter the enabled slot when one is available.
 - [x] Verify real-ingredient inventory persistence and occupied-slot protection during loading. Ingredient count, slot position, and grid configuration survive save/reload; loading leaves occupied slots enabled.
-- [ ] Verify that `setSlotDisabled()` rejects disabling an occupied slot through a player interaction once the menu is available.
+- [x] Verify occupied-slot protection during manual interactions. Clicking an occupied slot retrieves its item without toggling the slot; `setSlotDisabled()` also retains its server-side occupied-slot guard.
 - [x] Drop real ingredients when the mold is mined. Survival mining returns the mold item and exact ingredient count; the replaced mold has an empty ingredient inventory.
-- [ ] Add the manual menu and screen with a configurable 3x3 grid.
+- [x] Register the mold menu and client screen, supply the menu from the block entity, and send the mold position when opening. Compilation and empty-hand right-click opening verified in game.
+- [ ] Verify regular-click ingredient insertion/extraction and contents after closing and reopening the manual menu.
+- [x] Add ordinary item tooltips to the manual screen. Compilation and hovering over items verified in game.
+- [ ] Add shift-click transfers between the mold's ingredient grid and player inventory.
+- [x] Synchronize the nine enabled/disabled slot flags through menu `ContainerData` and draw vanilla crafter disabled-slot overlays. Command-configured patterns, manual insertion rejection/acceptance, and the display after closing and reopening verified in game.
+- [x] Add the manual menu and screen with a configurable 3x3 grid. Empty-slot clicks toggle both ways through a server-validated menu button request; occupied slots, a carried item, and player-inventory clicks retain ordinary inventory behavior. Compilation, in-game interactions, reopening, and save/reload verified.
+- [ ] Display the mold's synchronized fluid amount in the vertical bar left of the ingredient grid.
 - [ ] Find all compatible target recipes, including recipes using different virtual forms of the same molten metal.
 - [ ] Add a stonecutter-style result selector and automatically select an unambiguous recipe.
 - [ ] Display virtual metal ingredients and update the recipe/output preview automatically.

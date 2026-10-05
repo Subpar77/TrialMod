@@ -1,9 +1,17 @@
 package com.subpar77.trialmod.block.entity;
 
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.menu.FoundryMoldMenu;
+import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,8 +19,9 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.Nullable;
 
-public class FoundryMoldBlockEntity extends BlockEntity {
+public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider {
 
     public static final int SLOT_ENABLED = 0;
     public static final int SLOT_DISABLED = 1;
@@ -59,6 +68,28 @@ public class FoundryMoldBlockEntity extends BlockEntity {
         return true;
 
     }
+
+    private final ContainerData slotData = new ContainerData() {
+        @Override
+        public int get(int index) {
+            if(isSlotDisabled(index)) {
+                return SLOT_DISABLED;
+            }
+            return SLOT_ENABLED;
+        }
+
+        @Override
+        public void set(int index, int value) {
+            setSlotDisabled(index, value == SLOT_DISABLED);
+        }
+
+        @Override
+        public int getCount() {
+            return slotStates.length;
+        }
+    };
+
+    public final ContainerData getSlotData() {return slotData;}
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(9) {
         @Override
@@ -113,4 +144,14 @@ public class FoundryMoldBlockEntity extends BlockEntity {
     public IFluidHandler getFluidHandler() {return reservoir;}
 
     public IItemHandler getItemHandler() {return inputInventory;}
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("block.trial_mod.foundry_mold");
+    }
+
+    @Override
+    public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+        return new FoundryMoldMenu(ModMenus.FOUNDRY_MOLD_MENU.get(), containerId, inventory, this);
+    }
 }

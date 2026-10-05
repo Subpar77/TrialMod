@@ -4,12 +4,15 @@ import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.entity.ModBlockEntities;
 import com.subpar77.trialmod.client.model.FoundryTapModel;
 import com.subpar77.trialmod.client.renderer.FoundryTapRenderer;
+import com.subpar77.trialmod.client.screen.FoundryMoldScreen;
 import com.subpar77.trialmod.fluid.ModFluids;
+import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
@@ -31,6 +34,11 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.FOUNDRY_TAP_BLOCK_ENTITY.get(), FoundryTapRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(ModMenus.FOUNDRY_MOLD_MENU.get(), FoundryMoldScreen::new);
     }
 
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {

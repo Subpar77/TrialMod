@@ -6,6 +6,7 @@ import com.subpar77.trialmod.client.ClientModEvents;
 import com.subpar77.trialmod.fluid.ModFluids;
 import com.subpar77.trialmod.foundry.recipe.ModFoundryRecipes;
 import com.subpar77.trialmod.item.ModItems;
+import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -39,6 +40,7 @@ public class TrialMod {
         ModFluids.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModFoundryRecipes.register(modEventBus);
+        ModMenus.register(modEventBus);
 
 
         if (FMLEnvironment.dist.isClient()) {

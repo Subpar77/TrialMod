@@ -3,9 +3,7 @@ package com.subpar77.trialmod.block.entity;
 import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.ModBlocks;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
