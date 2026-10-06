@@ -32,6 +32,13 @@ public class FoundryMoldScreen extends AbstractContainerScreen<FoundryMoldMenu> 
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         renderTooltip(guiGraphics, mouseX, mouseY);
+
+        if(isHovering(FLUID_X, FLUID_Y, FLUID_WIDTH, FLUID_HEIGHT, mouseX, mouseY)) {
+            Component tooltip = Component.translatable("tooltip.trial_mod.foundry_mold.fluid_amount",
+                    menu.getFluidAmount(), menu.getFluidCapacity());
+
+            guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
+        }
     }
 
     @Override

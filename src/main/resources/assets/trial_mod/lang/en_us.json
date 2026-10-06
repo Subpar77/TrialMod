@@ -12,5 +12,7 @@
 
 
   "item.trial_mod.copper_slag_clump": "Copper Slag Clump",
-  "item.trial_mod.copper_slag_nugget": "Copper Slag Nugget"
+  "item.trial_mod.copper_slag_nugget": "Copper Slag Nugget",
+
+  "tooltip.trial_mod.foundry_mold.fluid_amount": "%s / %s mB"
 }
