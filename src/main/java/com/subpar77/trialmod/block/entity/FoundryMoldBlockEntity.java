@@ -1,6 +1,9 @@
 package com.subpar77.trialmod.block.entity;
 
+import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.recipe.FoundryCastingMatch;
+import com.subpar77.trialmod.foundry.recipe.FoundryCastingRecipes;
 import com.subpar77.trialmod.menu.FoundryMoldMenu;
 import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.core.BlockPos;
@@ -13,7 +16,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -21,6 +30,9 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -33,11 +45,11 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
     }
 
     public boolean isSlotDisabled(int slot) {
-        if(slot < 0 || slot >= slotStates.length) {
+        if (slot < 0 || slot >= slotStates.length) {
             return false;
         }
 
-        if(slotStates[slot] == SLOT_DISABLED) {
+        if (slotStates[slot] == SLOT_DISABLED) {
             return true;
         }
 
@@ -45,22 +57,22 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
     }
 
     public boolean setSlotDisabled(int slot, boolean disabled) {
-        if(slot < 0 || slot >= slotStates.length) {
+        if (slot < 0 || slot >= slotStates.length) {
             return false;
         }
 
-        if(disabled && !inputInventory.getStackInSlot(slot).isEmpty()) {
+        if (disabled && !inputInventory.getStackInSlot(slot).isEmpty()) {
             return false;
         }
 
         int targetState = SLOT_ENABLED;
-        if(disabled) {
+        if (disabled) {
             targetState = SLOT_DISABLED;
         } else {
             targetState = SLOT_ENABLED;
         }
 
-        if(slotStates[slot] == targetState) {
+        if (slotStates[slot] == targetState) {
             return false;
         }
 
@@ -73,19 +85,19 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
     private final ContainerData fluidData = new ContainerData() {
         @Override
         public int get(int index) {
-            if(index < 0 || index > 2) {
+            if (index < 0 || index > 2) {
                 return 0;
             }
 
-            if(index == 0) {
+            if (index == 0) {
                 return getFluidAmount();
             }
 
-            if(index == 1) {
+            if (index == 1) {
                 return getFluidCapacity();
             }
 
-            if(index == 2) {
+            if (index == 2) {
                 return getFluidId();
             }
 
@@ -103,15 +115,22 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         }
     };
 
-    public final ContainerData getFluidData() {return fluidData;}
+    public Optional<FoundryMaterial> getStoredMaterial() {
+        return FoundryMaterial.fromFluid(reservoir.getFluid().getFluid());
+    }
 
-    public int getFluidId() {return BuiltInRegistries.FLUID.getId(reservoir.getFluid().getFluid());
+    public final ContainerData getFluidData() {
+        return fluidData;
+    }
+
+    public int getFluidId() {
+        return BuiltInRegistries.FLUID.getId(reservoir.getFluid().getFluid());
     }
 
     private final ContainerData slotData = new ContainerData() {
         @Override
         public int get(int index) {
-            if(isSlotDisabled(index)) {
+            if (isSlotDisabled(index)) {
                 return SLOT_DISABLED;
             }
             return SLOT_ENABLED;
@@ -128,7 +147,9 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         }
     };
 
-    public final ContainerData getSlotData() {return slotData;}
+    public final ContainerData getSlotData() {
+        return slotData;
+    }
 
     private final ItemStackHandler inputInventory = new ItemStackHandler(9) {
         @Override
@@ -138,7 +159,7 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            if(isSlotDisabled(slot)) {
+            if (isSlotDisabled(slot)) {
                 return false;
             }
 
@@ -146,9 +167,13 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         }
     };
 
-    public final int getFluidAmount() {return reservoir.getFluidAmount();}
+    public final int getFluidAmount() {
+        return reservoir.getFluidAmount();
+    }
 
-    public final int getFluidCapacity() {return reservoir.getCapacity();}
+    public final int getFluidCapacity() {
+        return reservoir.getCapacity();
+    }
 
     private final FluidTank reservoir = new FluidTank(4000, stack ->
             FoundryMaterial.fromFluid(stack.getFluid()).isPresent()) {
@@ -173,20 +198,24 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         inputInventory.deserializeNBT(registries, tag.getCompound("InputInventory"));
 
         int[] savedSlotData = tag.getIntArray("SlotStates");
-        for(int slot = 0; slot < slotStates.length; slot++) {
+        for (int slot = 0; slot < slotStates.length; slot++) {
             slotStates[slot] = SLOT_ENABLED;
 
-            if(slot < savedSlotData.length && savedSlotData[slot] == SLOT_DISABLED) {
-                if(inputInventory.getStackInSlot(slot).isEmpty()) {
+            if (slot < savedSlotData.length && savedSlotData[slot] == SLOT_DISABLED) {
+                if (inputInventory.getStackInSlot(slot).isEmpty()) {
                     slotStates[slot] = SLOT_DISABLED;
                 }
             }
         }
     }
 
-    public IFluidHandler getFluidHandler() {return reservoir;}
+    public IFluidHandler getFluidHandler() {
+        return reservoir;
+    }
 
-    public IItemHandler getItemHandler() {return inputInventory;}
+    public IItemHandler getItemHandler() {
+        return inputInventory;
+    }
 
     @Override
     public Component getDisplayName() {
@@ -195,6 +224,23 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+
+        Optional<FoundryMaterial> storedFluid = getStoredMaterial();
+
+        if (storedFluid.isPresent()) {
+            FoundryMaterial material = storedFluid.get();
+
+            List<FoundryCastingMatch> matches = FoundryCastingRecipes.findCastingMatches(player.level(), this,
+                    material);
+
+            TrialMod.LOGGER.info("[Foundry] Casting matches: {}", matches.size());
+
+            for(FoundryCastingMatch match : matches) {
+                TrialMod.LOGGER.info("[Foundry] Recipe: {} | Virtual ingredient: {}",
+                        match.recipe().id(), match.virtualIngredient().getDescription());
+            }
+        }
+
         return new FoundryMoldMenu(ModMenus.FOUNDRY_MOLD_MENU.get(), containerId, inventory, this);
     }
 }

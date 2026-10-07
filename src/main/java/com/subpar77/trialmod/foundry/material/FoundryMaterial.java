@@ -6,9 +6,11 @@ import com.subpar77.trialmod.fluid.ModFluids;
 import com.subpar77.trialmod.item.ModItems;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -98,6 +100,12 @@ public enum FoundryMaterial implements StringRepresentable {
             }
         }
         return Optional.empty();
+    }
+
+    public List<Item> getVirtualIngredientItems() {
+        return switch (this) {
+            case COPPER -> List.of(Items.COPPER_INGOT, Items.COPPER_BLOCK);
+        };
     }
 
     @Override
