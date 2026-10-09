@@ -1,7 +1,11 @@
 package com.subpar77.trialmod.menu;
 
+import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.block.ModBlocks;
 import com.subpar77.trialmod.block.entity.FoundryMoldBlockEntity;
+import com.subpar77.trialmod.foundry.material.FoundryMaterial;
+import com.subpar77.trialmod.foundry.recipe.FoundryCastingMatch;
+import com.subpar77.trialmod.foundry.recipe.FoundryCastingRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -9,16 +13,22 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Optional;
 
 public class FoundryMoldMenu extends AbstractContainerMenu {
 
     private final FoundryMoldBlockEntity mold;
     private final ContainerLevelAccess access;
     private final ContainerData fluidData;
+    private List<FoundryCastingMatch> castingMatches = List.of();
+    private int lastCastingRevision = -1;
 
     private FoundryMoldMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory,
                            FoundryMoldBlockEntity mold, ContainerData fluidData) {
@@ -49,6 +59,7 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
 
         addDataSlots(mold.getSlotData());
         addDataSlots(this.fluidData);
+        refreshCastingMatches();
     }
 
     public FoundryMoldMenu(@Nullable MenuType<?> menuType, int containerId, Inventory playerInventory,
@@ -76,6 +87,25 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
         }
     }
 
+    private void refreshCastingMatches() {
+        Level level = mold.getLevel();
+
+        if(level == null || level.isClientSide) {
+            return;
+        }
+
+        castingMatches = List.of();
+        Optional<FoundryMaterial> storedMaterial = mold.getStoredMaterial();
+
+        if(storedMaterial.isPresent()) {
+            castingMatches = FoundryCastingRecipes.findCastingMatches(level, mold, storedMaterial.get());
+        }
+
+        lastCastingRevision = mold.getCastingRevision();
+
+        TrialMod.LOGGER.info("[Foundry] Menu casting matches: {}", castingMatches.size());
+    }
+
     public FoundryMoldMenu(int containerID, Inventory playerInventory, RegistryFriendlyByteBuf extraData) {
         this(ModMenus.FOUNDRY_MOLD_MENU.get(), containerID, playerInventory, findMold(playerInventory,
                 extraData.readBlockPos()), new SimpleContainerData(3));
@@ -93,6 +123,17 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
         }
 
         return mold.setSlotDisabled(id, !isSlotDisabled(id));
+    }
+
+    @Override
+    public void broadcastChanges() {
+        Level level = mold.getLevel();
+
+        if(level != null && !level.isClientSide && lastCastingRevision != mold.getCastingRevision()) {
+            refreshCastingMatches();
+        }
+
+        super.broadcastChanges();
     }
 
     @Override
@@ -131,7 +172,7 @@ public class FoundryMoldMenu extends AbstractContainerMenu {
         }
 
         sourceSlot.onTake(player, sourceStack);
-        mold.setChanged();
+        mold.markCastingInputsChanged();
         return originalStack;
     }
 

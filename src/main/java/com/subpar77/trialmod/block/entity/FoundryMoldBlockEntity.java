@@ -16,13 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.CraftingInput;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -39,6 +33,7 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
     public static final int SLOT_ENABLED = 0;
     public static final int SLOT_DISABLED = 1;
     private final int[] slotStates = new int[9];
+    private int castingRevision = 0;
 
     public FoundryMoldBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.FOUNDRY_MOLD_ENTITY.get(), pos, blockState);
@@ -77,7 +72,7 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         }
 
         slotStates[slot] = targetState;
-        setChanged();
+        markCastingInputsChanged();
         return true;
 
     }
@@ -114,6 +109,8 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
             return 3;
         }
     };
+
+    public int getCastingRevision() {return castingRevision;}
 
     public Optional<FoundryMaterial> getStoredMaterial() {
         return FoundryMaterial.fromFluid(reservoir.getFluid().getFluid());
@@ -154,7 +151,7 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
     private final ItemStackHandler inputInventory = new ItemStackHandler(9) {
         @Override
         protected void onContentsChanged(int slot) {
-            FoundryMoldBlockEntity.this.setChanged();
+            FoundryMoldBlockEntity.this.markCastingInputsChanged();
         }
 
         @Override
@@ -175,11 +172,16 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
         return reservoir.getCapacity();
     }
 
+    public void markCastingInputsChanged() {
+        castingRevision++;
+        setChanged();
+    }
+
     private final FluidTank reservoir = new FluidTank(4000, stack ->
             FoundryMaterial.fromFluid(stack.getFluid()).isPresent()) {
         @Override
         protected void onContentsChanged() {
-            FoundryMoldBlockEntity.this.setChanged();
+            FoundryMoldBlockEntity.this.markCastingInputsChanged();
         }
     };
 
@@ -224,22 +226,6 @@ public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider 
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-
-        Optional<FoundryMaterial> storedFluid = getStoredMaterial();
-
-        if (storedFluid.isPresent()) {
-            FoundryMaterial material = storedFluid.get();
-
-            List<FoundryCastingMatch> matches = FoundryCastingRecipes.findCastingMatches(player.level(), this,
-                    material);
-
-            TrialMod.LOGGER.info("[Foundry] Casting matches: {}", matches.size());
-
-            for(FoundryCastingMatch match : matches) {
-                TrialMod.LOGGER.info("[Foundry] Recipe: {} | Virtual ingredient: {}",
-                        match.recipe().id(), match.virtualIngredient().getDescription());
-            }
-        }
 
         return new FoundryMoldMenu(ModMenus.FOUNDRY_MOLD_MENU.get(), containerId, inventory, this);
     }
