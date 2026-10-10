@@ -1,9 +1,6 @@
 package com.subpar77.trialmod.block.entity;
 
-import com.subpar77.trialmod.TrialMod;
 import com.subpar77.trialmod.foundry.material.FoundryMaterial;
-import com.subpar77.trialmod.foundry.recipe.FoundryCastingMatch;
-import com.subpar77.trialmod.foundry.recipe.FoundryCastingRecipes;
 import com.subpar77.trialmod.menu.FoundryMoldMenu;
 import com.subpar77.trialmod.menu.ModMenus;
 import net.minecraft.core.BlockPos;
@@ -25,7 +22,6 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
 
 public class FoundryMoldBlockEntity extends BlockEntity implements MenuProvider {

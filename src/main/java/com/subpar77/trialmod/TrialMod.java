@@ -7,6 +7,7 @@ import com.subpar77.trialmod.fluid.ModFluids;
 import com.subpar77.trialmod.foundry.recipe.ModFoundryRecipes;
 import com.subpar77.trialmod.item.ModItems;
 import com.subpar77.trialmod.menu.ModMenus;
+import com.subpar77.trialmod.network.ModNetworking;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -32,6 +33,7 @@ public class TrialMod {
 
         modEventBus.addListener(this::addCreative);
         modEventBus.addListener(ModCapabilities::registerCapabilities);
+        modEventBus.addListener(ModNetworking::registerPayloadHandlers);
 
         // Register the Deferred Register to the mod event bus so items get registered
         ModBlocks.register(modEventBus);
